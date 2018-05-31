@@ -13,13 +13,14 @@ Vue.use(ElementUI);
 Vue.use(Router);
 
 const routes = [
+  { path: '/', component: () => import('./Dashboard.vue') },
   { path: '/import', component: () => import('./Import.vue') },
   { path: '/export', component: () => import('./Export.vue') },
   { path: '/company', component: () => import('./Company.vue') },
   { path: '/product', component: () => import('./Product.vue') },
   { path: '/receipt', component: () => import('./Receipt.vue') },
   { path: '/inventory', component: () => import('./Inventory.vue') },
-  { path: '/purchaseManage/purchasePlan', component: () => import('./Import.vue') },
+  // { path: '/purchaseManage/purchasePlan', component: () => import('./Import.vue') },
   { path: '/purchaseManage/ConfirmForm', component: () => import('./ConfirmForm.vue') },
   { path: '/purchaseManage/ConfirmLog', component: () => import('./ConfirmLog.vue') },
   { path: '/purchaseManage/purchaseImport', component: () => import('./Import.vue') },

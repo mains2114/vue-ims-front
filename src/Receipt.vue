@@ -26,7 +26,7 @@
     <br>
 
     <el-table :data="rows" border v-loading="loading">
-      <el-table-column type="selection"></el-table-column>
+      <!--<el-table-column type="selection"></el-table-column>-->
       <el-table-column prop="formatted_no" label="单据编号" width="150px"></el-table-column>
       <el-table-column prop="company_name" label="供货商/收货单位"></el-table-column>
       <el-table-column prop="date" label="制单时间"></el-table-column>
@@ -38,6 +38,7 @@
       <el-table-column label="操作">
         <template slot-scope="scope">
           <el-button size="small" @click="openFormEdit(scope.row)" type="text">查看</el-button>
+          <el-button size="small" @click="deleteRows('receipt', [scope.row.id])" type="text">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -77,7 +78,7 @@
             {{ scope.row.product.name }} - {{ scope.row.product.model }}
           </template>
         </el-table-column>
-        <el-table-column align="center" prop="product.company_id" label="厂家"></el-table-column>
+        <el-table-column align="center" prop="product.company.name" label="厂家"></el-table-column>
         <el-table-column align="center" prop="product.unit" label="单位"></el-table-column>
         <el-table-column align="center" prop="num" label="数量">
           <template slot-scope="scope">
@@ -116,6 +117,7 @@
         formRows: [],
         urls: {
           getRows: this.url('/api/getReceipts'),
+          delRows: this.url('/api/delRecords'),
           add: this.url('/product/create'),
           edit: this.url('/product/'),
           getAllCompanies: this.url('/api/getAllCompanies')
@@ -141,6 +143,24 @@
 
           this.loading = false;
         })
+      },
+      deleteRows(module, records) {
+        let form = {
+          module,
+          records
+        };
+
+        this.$http.post(this.urls.delRows, form).then(response => {
+          if (response.data.error === 0) {
+            this.$message.success(response.data.msg || '操作成功');
+
+            this.getRows();
+            return;
+          }
+
+          console.log(response);
+          this.$message.error(response.data.msg || '请求错误');
+        });
       },
       getAllCompanies() {
         this.$http.get(this.urls.getAllCompanies).then(response => {
@@ -172,9 +192,15 @@
           : this.urls.edit + this.form.id;
 
         this.$http.post(url, this.form).then(response => {
-          this.$message.success(response);
-          this.formVisible = false;
-          this.getRows();
+          if (response.data.error === 0) {
+            this.$message.success(response.data.msg || '操作成功');
+            this.formVisible = false;
+            this.getRows();
+            return;
+          }
+
+          console.log(response);
+          this.$message.error(response.data.msg || '请求错误');
         });
       }
     },

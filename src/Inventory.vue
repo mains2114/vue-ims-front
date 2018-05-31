@@ -3,7 +3,7 @@
     <h3>库存变更记录</h3>
 
     <el-row>
-      <el-col :span="12">
+      <el-col :span="24">
         <el-button type="primary" @click="openFormAdd()">入库</el-button>
         <el-button type="primary" @click="openFormAdd()">出库</el-button>
 
@@ -29,7 +29,7 @@
           <el-option value="out" label="出库"></el-option>
         </el-select>
       </el-col>
-      <el-col :span="12"></el-col>
+      <!--<el-col :span="12"></el-col>-->
     </el-row>
     <br>
 

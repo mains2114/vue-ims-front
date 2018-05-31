@@ -1,8 +1,8 @@
 <template>
   <el-container>
     <el-header>
-      <el-menu mode="horizontal" router :default-active="$route.path === '/' ? '/index' : $route.path">
-        <el-menu-item index="/index">主页</el-menu-item>
+      <el-menu mode="horizontal" router :default-active="$route.path === '/' ? '/' : $route.path">
+        <el-menu-item index="/">主页</el-menu-item>
         <el-menu-item index="/company">公司</el-menu-item>
         <el-menu-item index="/product">货品与库存</el-menu-item>
         <el-menu-item index="/receipt">单据</el-menu-item>

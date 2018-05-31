@@ -19,19 +19,7 @@
     </el-row>
     <br>
 
-    <el-table :data="rows" border>
-      <!--<el-table-column type="expand">-->
-        <!--<template slot-scope="scope">-->
-          <!--<el-row v-for="item in scope.row.storage" style="margin-bottom: 5px;">-->
-            <!--<span style="display: inline-block;width: 200px;">生产批次：{{ item.batch }}</span>-->
-            <!--<span style="display: inline-block;width: 200px;">库存：{{ item.num }}</span>-->
-          <!--</el-row>-->
-          <!--<el-row style="margin-bottom: 5px;">-->
-            <!--<span style="display: inline-block;width: 200px;"></span>-->
-            <!--<span style="display: inline-block;width: 200px;">总计：{{ scope.row.storage.reduce((acc, curr) => acc + parseInt(curr.num), 0) }}</span>-->
-          <!--</el-row>-->
-        <!--</template>-->
-      <!--</el-table-column>-->
+    <el-table :data="rows" border v-loading="loading">
       <!--<el-table-column type="selection"></el-table-column>-->
       <el-table-column prop="id" label="编号" width="80px"></el-table-column>
       <el-table-column prop="name" label="名称"></el-table-column>
@@ -55,6 +43,7 @@
       <el-table-column label="操作">
         <template slot-scope="scope">
           <el-button size="small" @click="openFormEdit(scope.row)" type="text">编辑</el-button>
+          <el-button size="small" @click="deleteRows('product', [scope.row.id])" type="text">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -135,6 +124,7 @@
     name: "Company",
     data() {
       return {
+        loading: false,
         companyId: '',
         companies: [],
         rows: [],
@@ -148,6 +138,7 @@
         dialog2Rows: [],
         urls: {
           getRows: this.url('/api/getProducts'),
+          delRows: this.url('/api/delRecords'),
           add: this.url('/product/create'),
           edit: this.url('/product/'),
           getAllCompanies: this.url('/api/getAllCompanies')
@@ -156,6 +147,8 @@
     },
     methods: {
       getRows() {
+        this.loading = true;
+
         this.$http.get(this.urls.getRows, {
           params: {
             sort: 'id',
@@ -167,7 +160,27 @@
         }).then(response => {
           this.rows = response.data.rows || [];
           this.total = response.data.total || 0;
+
+          this.loading = false;
         })
+      },
+      deleteRows(module, records) {
+        let form = {
+          module,
+          records
+        };
+
+        this.$http.post(this.urls.delRows, form).then(response => {
+          if (response.data.error === 0) {
+            this.$message.success(response.data.msg || '操作成功');
+
+            this.getRows();
+            return;
+          }
+
+          console.log(response);
+          this.$message.error(response.data.msg || '请求错误');
+        });
       },
       getAllCompanies() {
         this.$http.get(this.urls.getAllCompanies).then(response => {
@@ -189,7 +202,7 @@
       },
       openFormEdit(item) {
         this.formMode = 'edit';
-        this.form = item;
+        this.form = Object.assign({}, item);
         this.formVisible = true;
       },
       openDialog2(rows) {
@@ -202,9 +215,15 @@
           : this.urls.edit + this.form.id;
 
         this.$http.post(url, this.form).then(response => {
-          this.$message.success(response);
-          this.formVisible = false;
-          this.getRows();
+          if (response.data.error === 0) {
+            this.$message.success(response.data.msg || '操作成功');
+            this.formVisible = false;
+            this.getRows();
+            return;
+          }
+
+          console.log(response);
+          this.$message.error(response.data.msg || '请求错误');
         });
       }
     },

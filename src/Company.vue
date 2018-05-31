@@ -7,7 +7,7 @@
         <el-button type="primary" @click="openFormAdd()">添加</el-button>
 
         <el-select v-model="companyType" @change="handleSelectChange">
-          <el-option value="" label="显示所有类型公司"></el-option>
+          <el-option value="" label="显示所有公司"></el-option>
           <el-option value="manufacturer" label="仅显示生产商"></el-option>
           <el-option value="customer" label="仅显示顾客"></el-option>
           <el-option value="seller" label="仅显示销售商"></el-option>
@@ -17,19 +17,23 @@
     </el-row>
     <br>
 
-    <el-table :data="rows" border>
-      <el-table-column type="selection"></el-table-column>
+    <el-table :data="rows" border v-loading="loading">
+      <!--<el-table-column type="selection"></el-table-column>-->
       <el-table-column prop="id" label="编号" width="80px"></el-table-column>
       <el-table-column prop="name" label="公司简称"></el-table-column>
       <el-table-column prop="full_name" label="公司全称"></el-table-column>
-      <el-table-column prop="type" label="类型"></el-table-column>
+      <el-table-column prop="type" label="类型">
+        <template slot-scope="scope">
+          {{ companyTypes[ scope.row.type ] }}
+        </template>
+      </el-table-column>
       <el-table-column prop="contact" label="联系人"></el-table-column>
       <el-table-column prop="tel" label="电话"></el-table-column>
       <el-table-column prop="created_at" label="创建时间"></el-table-column>
       <el-table-column label="操作">
         <template slot-scope="scope">
-          <!--<a href="#" @click.prevent="openFormEdit(scope.row)">编辑</a>-->
           <el-button size="small" @click="openFormEdit(scope.row)" type="text">编辑</el-button>
+          <el-button size="small" @click="deleteRows('company', [scope.row.id])" type="text">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -92,6 +96,12 @@
     name: "Company",
     data() {
       return {
+        loading: false,
+        companyTypes: {
+          manufacturer: '生产商',
+          seller: '销售商',
+          customer: '顾客',
+        },
         companyType: '',
         rows: [],
         total: 0,
@@ -102,6 +112,7 @@
         form: {},
         urls: {
           getRows: this.url('/api/getCompanies'),
+          delRows: this.url('/api/delRecords'),
           add: this.url('/company/create'),
           edit: this.url('/company/'),
           getAllCompanies: this.url('/api/getAllCompanies')
@@ -110,6 +121,8 @@
     },
     methods: {
       getRows() {
+        this.loading = true;
+
         this.$http.get(this.urls.getRows, {
           params: {
             sort: 'id',
@@ -121,7 +134,27 @@
         }).then(response => {
           this.rows = response.data.rows || [];
           this.total = response.data.total || 0;
+
+          this.loading = false;
         })
+      },
+      deleteRows(module, records) {
+        let form = {
+          module,
+          records
+        };
+
+        this.$http.post(this.urls.delRows, form).then(response => {
+          if (response.data.error === 0) {
+            this.$message.success(response.data.msg || '操作成功');
+
+            this.getRows();
+            return;
+          }
+
+          console.log(response);
+          this.$message.error(response.data.msg || '请求错误');
+        });
       },
       handleSizeChange(val) {
         this.pageSize = val;
@@ -138,7 +171,7 @@
       },
       openFormEdit(item) {
         this.formMode = 'edit';
-        this.form = item;
+        this.form = Object.assign({}, item);
         this.formVisible = true;
       },
       submitForm() {
@@ -147,9 +180,15 @@
           : this.urls.edit + this.form.id;
 
         this.$http.post(url, this.form).then(response => {
-          this.$message.success(response);
-          this.formVisible = false;
-          this.getRows();
+          if (response.data.error === 0) {
+            this.$message.success(response.data.msg || '操作成功');
+            this.formVisible = false;
+            this.getRows();
+            return;
+          }
+
+          console.log(response);
+          this.$message.error(response.data.msg || '请求错误');
         });
       }
     },

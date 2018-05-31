@@ -241,18 +241,16 @@
           };
         });
 
-        this.$http.post(this.urls.submitForm, form).then(
-          response => {
-            if (response.data.error === 0) {
-              this.$message.success(response.data.msg || '操作成功');
-              this.$router.push('/receipt');
-              return;
-            }
-
-            console.log(response);
-            this.$message.error(response.data.msg || '请求错误');
+        this.$http.post(this.urls.submitForm, form).then(response => {
+          if (response.data.error === 0) {
+            this.$message.success(response.data.msg || '操作成功');
+            this.$router.push('/receipt');
+            return;
           }
-        );
+
+          console.log(response);
+          this.$message.error(response.data.msg || '请求错误');
+        });
       }
     },
     created() {
