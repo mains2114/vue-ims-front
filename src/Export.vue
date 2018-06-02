@@ -8,15 +8,22 @@
     <el-row>
       <el-col :span="12" align="left">
         <el-form-item label="收货单位">
-          <el-select v-model="form.company_id" filterable>
-            <el-option v-for="company in companies" :key="company.id" :value="company.id" :label="company.name">
-            </el-option>
+          <el-select v-model="form.companyId" filterable>
+            <el-option-group v-for="group in companiesGrouped"
+                             :key="group.label"
+                             :label="group.label">
+              <el-option v-for="company in group.children"
+                         :key="company.id"
+                         :value="company.id"
+                         :label="company.id + '. ' + company.name">
+              </el-option>
+            </el-option-group>
           </el-select>
         </el-form-item>
       </el-col>
       <el-col :span="12" align="right">
         <el-form-item label="制单时间">
-          <el-date-picker type="date" v-model="form.date1"></el-date-picker>
+          <el-date-picker type="date" v-model="form.date"></el-date-picker>
         </el-form-item>
       </el-col>
     </el-row>
@@ -76,7 +83,7 @@
     <el-dialog title="选择货物（仅能选择有库存的货物）" :visible.sync="dialogFormVisible">
       <el-form :model="form">
         <el-form-item label="生产商" :label-width="formLabelWidth">
-          <el-select v-model="productsFilter" placeholder="请选择生产商">
+          <el-select v-model="productsFilter" placeholder="请选择生产商" filterable>
             <el-option v-for="company in companies"
                        v-if="company.type === 'manufacturer'"
                        :key="company.id"
@@ -116,14 +123,8 @@
         tableRows: [],
         dialogFormVisible: false,
         form: {
-          name: '',
-          region: '',
-          date1: '',
-          date2: '',
-          delivery: false,
-          type: [],
-          resource: '',
-          desc: '',
+          companyId: null,
+          date: '',
         },
         formLabelWidth: '120px',
         companyType: null,
@@ -138,7 +139,7 @@
           edit: this.url('/company/'),
           getAllCompanies: this.url('/api/getAllCompanies'),
           getStorage: this.url('/api/getStorage'),
-          saveExportReceipt: this.url('/inventory/export')
+          submitForm: this.url('/inventory/export'),
         }
       }
     },
@@ -155,6 +156,28 @@
             return false;
           }
         })
+      },
+      companiesGrouped() {
+        let group = {
+          manufacturer: {
+            label: '生产商',
+            children: [],
+          },
+          seller: {
+            label: '销售商',
+            children: [],
+          },
+          customer: {
+            label: '顾客',
+            children: [],
+          }
+        };
+
+        _.each(this.companies, company => {
+          group[ company.type ].children.push(company);
+        });
+
+        return group;
       }
     },
     filters: {
@@ -163,9 +186,6 @@
       }
     },
     methods: {
-      // url(api) {
-      //   return '/json' + api + '.json';
-      // },
       getManufacturers() {
         this.$http.get(this.urls.getAllCompanies).then(response => {
           this.companies = response.data.rows;
@@ -201,7 +221,7 @@
       },
       submitReceipt() {
         var form = {
-          company_id: this.form.company_id,
+          company_id: this.form.companyId,
           rows: []
         };
 
@@ -215,11 +235,16 @@
           };
         });
 
-        this.$http.post(this.urls.saveExportReceipt, form).then(
-          response => {
-            console.log(response);
+        this.$http.post(this.urls.submitForm, form).then(response => {
+          if (response.data.error === 0) {
+            this.$message.success(response.data.msg || '操作成功');
+            this.$router.push('/receipt');
+            return;
           }
-        );
+
+          console.log(response);
+          this.$message.error(response.data.msg || '请求错误');
+        });
       }
     },
     created() {

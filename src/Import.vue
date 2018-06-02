@@ -8,20 +8,14 @@
     <el-row>
       <el-col :span="12" align="left">
         <el-form-item label="供货单位">
-          <!--<el-select v-model="form.company_id" filterable>-->
-            <!--<el-option v-for="company in companies"-->
-                       <!--:key="company.id"-->
-                       <!--:value="company.id"-->
-                       <!--:label="company.id + '. ' + company.name">-->
-            <!--</el-option>-->
-          <!--</el-select>-->
-
-          <el-select v-model="form.companyId">
+          <el-select v-model="form.companyId" filterable>
             <el-option-group v-for="group in companiesGrouped"
                              :key="group.label"
                              :label="group.label">
               <el-option v-for="company in group.children"
-                         :key="company.id" :value="company.id" :label="company.id + '. ' + company.name">
+                         :key="company.id"
+                         :value="company.id"
+                         :label="company.id + '. ' + company.name">
               </el-option>
             </el-option-group>
           </el-select>
@@ -97,7 +91,7 @@
     <el-dialog title="选择货物" :visible.sync="dialogFormVisible">
       <el-form inline>
         <el-form-item label="生产商" :label-width="formLabelWidth">
-          <el-select v-model="productsFilter" placeholder="请选择生产商">
+          <el-select v-model="productsFilter" placeholder="请选择生产商" filterable>
             <el-option v-for="company in companies"
                        v-if="company.type === 'manufacturer'"
                        :key="company.id"
