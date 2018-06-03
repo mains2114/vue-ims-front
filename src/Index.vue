@@ -14,8 +14,19 @@
           <el-menu-item index="/purchaseManage/purchasePlan">采购计划</el-menu-item>
           <el-menu-item index="/purchaseManage/confirmForm">采购验收</el-menu-item>
           <el-menu-item index="/purchaseManage/confirmLog">验收记录</el-menu-item>
-          <el-menu-item index="/purchaseManage/purchaseImport">采购入库</el-menu-item>
+          <el-menu-item index="/purchaseManage/confirmImport">验收入库</el-menu-item>
         </el-submenu>
+        <el-dropdown class="ims-user-info" @command="handleCommand">
+          <span class="el-dropdown-link">
+            {{ username }}
+            <i class="el-icon-arrow-down el-icon--right"></i>
+          </span>
+          <el-dropdown-menu slot="dropdown">
+            <el-dropdown-item>用户信息</el-dropdown-item>
+            <el-dropdown-item command="oldVersion">切换旧版本</el-dropdown-item>
+            <el-dropdown-item divided command="logout">退出登录</el-dropdown-item>
+          </el-dropdown-menu>
+        </el-dropdown>
       </el-menu>
     </el-header>
     <el-main>
@@ -29,10 +40,40 @@
 
 <script>
   export default {
-    name: "Index"
+    name: "Index",
+    data() {
+      return {
+        username: window.$USERNAME || '用户名',
+      };
+    },
+    methods: {
+      handleCommand(command) {
+        if (command === 'logout') {
+          this.logout();
+        } else if (command === 'oldVersion') {
+          window.location.href = '/home';
+        }
+      },
+      logout() {
+        this.$http.post(this.url('/logout')).then(() => {
+          window.location.href = '/';
+        });
+      }
+    }
   }
 </script>
 
-<style scoped>
-
+<style>
+  .el-dropdown-link {
+    cursor: pointer;
+    color: #409eff;
+  }
+  .ims-user-info {
+    float: right;
+  }
+  .ims-user-info > span {
+    line-height: 60px;
+    height: 60px;
+    padding: 0 20px;
+  }
 </style>

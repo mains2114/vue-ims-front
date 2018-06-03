@@ -1,27 +1,47 @@
 <template>
   <el-form inline>
-
     <el-row style="font-size: 24px;">
-      <el-col :span="12" :offset="0" align="left">采购验收</el-col>
+      <el-col :span="12" :offset="6" align="center">验收入库</el-col>
+      <el-col :span="6" align="right">No.00001234</el-col>
     </el-row>
-    <br>
+
+    <el-row>
+      <el-col :span="12" align="left">
+        <el-form-item label="供货单位">
+          <el-select v-model="form.companyId" filterable>
+            <el-option-group v-for="group in companiesGrouped"
+                             :key="group.label"
+                             :label="group.label">
+              <el-option v-for="company in group.children"
+                         :key="company.id"
+                         :value="company.id"
+                         :label="company.id + '. ' + company.name">
+              </el-option>
+            </el-option-group>
+          </el-select>
+        </el-form-item>
+      </el-col>
+      <el-col :span="12" align="right">
+        <el-form-item label="制单时间">
+          <el-date-picker type="date" v-model="form.date"></el-date-picker>
+        </el-form-item>
+      </el-col>
+    </el-row>
 
     <el-table border="" :data="tableRows">
-      <el-table-column prop="id" label="验收日期" width="100">
-        <template slot-scope="scope">2018-05-27</template>
-      </el-table-column>
-      <el-table-column prop="name" label="品名及规格" width="200">
-        <template slot-scope="scope">{{ scope.row.name + ' - ' + scope.row.model }}</template>
-      </el-table-column>
-      <el-table-column prop="company_name" label="生产厂家"></el-table-column>
-      <el-table-column prop="num" label="数量">
+      <el-table-column prop="id" label="编号" width="60"></el-table-column>
+      <el-table-column prop="product_name" label="名称"></el-table-column>
+      <el-table-column prop="product_model" label="规格"></el-table-column>
+      <el-table-column prop="manufacturer" label="生产厂家"></el-table-column>
+      <el-table-column prop="product_unit" label="单位" width="60"></el-table-column>
+      <el-table-column prop="price" label="单价">
         <template slot-scope="scope">
-          <el-input v-model="scope.row.num2" size="small"></el-input>
+          <el-input v-model="scope.row.price" size="small"></el-input>
         </template>
       </el-table-column>
-      <el-table-column prop="prefer_price" label="单价">
+      <el-table-column prop="num" label="数量">
         <template slot-scope="scope">
-          <el-input v-model="scope.row.prefer_price" size="small"></el-input>
+          <el-input-number v-model="scope.row.num" :min="0" size="small"></el-input-number>
         </template>
       </el-table-column>
       <el-table-column prop="batch" label="生产批号">
@@ -29,50 +49,16 @@
           <el-input v-model="scope.row.batch" size="small"></el-input>
         </template>
       </el-table-column>
-      <el-table-column prop="batch2" label="灭菌批号">
-        <template slot-scope="scope">
-          <el-input v-model="scope.row.batch2" size="small"></el-input>
-        </template>
-      </el-table-column>
       <el-table-column prop="expire" label="有效期" width="165">
         <template slot-scope="scope">
           <el-date-picker type="date" v-model="scope.row.expire" size="small" placeholder="选择日期"></el-date-picker>
         </template>
       </el-table-column>
-      <el-table-column prop="company_id" label="供货单位" width="200">
+      <el-table-column prop="total" label="总价" width="100">
         <template slot-scope="scope">
-          <el-select v-model="scope.row.company_id" size="small">
-            <el-option-group v-for="group in companiesGrouped"
-                             :key="group.label"
-                             :label="group.label">
-              <el-option v-for="company in group.children"
-                         :key="company.id" :value="company.id" :label="company.id + '. ' + company.name">
-              </el-option>
-            </el-option-group>
-          </el-select>
+          {{ scope.row.price * (scope.row.num2 || 0) | toFixed(2) }}
         </template>
       </el-table-column>
-      <el-table-column prop="company_audit" label="资质证明">
-        <template slot-scope="scope">
-          <el-input v-model="scope.row.company_audit" size="small"></el-input>
-        </template>
-      </el-table-column>
-      <el-table-column prop="package_status" label="包装情况">
-        <template slot-scope="scope">
-          <el-input v-model="scope.row.package_status" size="small"></el-input>
-        </template>
-      </el-table-column>
-      <el-table-column prop="conclusion" label="结论">
-        <template slot-scope="scope">
-          <el-input v-model="scope.row.conclusion" size="small"></el-input>
-        </template>
-      </el-table-column>
-      <el-table-column prop="confirm_person" label="验收人">
-        <template slot-scope="scope">
-          <el-input v-model="scope.row.confirm_person" size="small"></el-input>
-        </template>
-      </el-table-column>
-
       <el-table-column label="操作" width="80" fixed="right">
         <template slot-scope="scope">
           <el-button type="text" icon="el-icon-delete" size="small" @click="deleteTableRow(scope.row)">删除</el-button>
@@ -82,17 +68,30 @@
 
     <br>
 
+    <el-row style="text-align: left;">
+      <el-col :span="6">收货人：黄忠发</el-col>
+      <el-col :span="6">送货人：</el-col>
+      <el-col :span="6">制单：熊水香</el-col>
+      <el-col :span="6">单位盖章：（未盖章无效）</el-col>
+    </el-row>
+
+    <el-row style="text-align: left;">
+      <el-col :span="6">地址：钟山县西路原收费站北侧</el-col>
+      <el-col :span="12">电话：8972468&nbsp;&nbsp;13132943929&nbsp;&nbsp;13878456812</el-col>
+      <el-col :span="6">传真：8972468</el-col>
+    </el-row>
+
     <el-row>
       <el-col :span="12" :offset="6" style="text-align: center;">
-        <el-button type="text" icon="el-icon-plus" @click="dialogFormVisible = true">选择货物</el-button>
+        <el-button type="text" icon="el-icon-plus" @click="dialogFormVisible = true">添加货物</el-button>
         <el-button type="text" icon="el-icon-message" @click="submitReceipt">提交表单</el-button>
       </el-col>
     </el-row>
 
-    <el-dialog title="选择货物" :visible.sync="dialogFormVisible">
-      <el-form :model="form" inline>
+    <el-dialog title="选择验收记录进行入库" :visible.sync="dialogFormVisible">
+      <el-form inline>
         <el-form-item label="生产商" :label-width="formLabelWidth">
-          <el-select v-model="productsFilter" placeholder="请选择生产商">
+          <el-select v-model="productsFilter" placeholder="请选择生产商" filterable clearable @change="getProducts">
             <el-option v-for="company in companies"
                        v-if="company.type === 'manufacturer'"
                        :key="company.id"
@@ -103,14 +102,17 @@
         </el-form-item>
       </el-form>
 
-      <el-table ref="selectTable" border="" :data="productsFiltered" height="400" @selection-change="productSelectedChange">
+      <el-table ref="selectTable" border="" :data="products" height="400" @selection-change="productSelectedChange">
         <el-table-column prop="id" label="编号" type="selection"></el-table-column>
-        <el-table-column prop="company_name" label="生产厂家"></el-table-column>
-        <el-table-column prop="name" label="名称" width="200" sortable></el-table-column>
-        <el-table-column prop="model" label="规格"></el-table-column>
-        <el-table-column prop="unit" label="单位"></el-table-column>
-        <el-table-column prop="price" label="单价"></el-table-column>
+        <el-table-column prop="manufacturer" label="生产厂家"></el-table-column>
+        <el-table-column prop="product_name" label="名称" width="200" sortable></el-table-column>
+        <el-table-column prop="product_model" label="规格"></el-table-column>
+        <el-table-column prop="batch" label="生产批号"></el-table-column>
+        <el-table-column prop="batch2" label="灭菌批号"></el-table-column>
+        <el-table-column prop="expire" label="有效期" width="100"></el-table-column>
+        <el-table-column prop="price" label="单价" width="60"></el-table-column>
         <el-table-column prop="num" label="数量"></el-table-column>
+        <el-table-column prop="conclusion" label="结论"></el-table-column>
       </el-table>
 
       <div slot="footer" class="dialog-footer">
@@ -130,14 +132,8 @@
         tableRows: [],
         dialogFormVisible: false,
         form: {
-          name: '',
-          region: '',
-          date1: '',
-          date2: '',
-          delivery: false,
-          type: [],
-          resource: '',
-          desc: '',
+          companyId: null,
+          date: '',
         },
         formLabelWidth: '120px',
         companyType: null,
@@ -151,7 +147,8 @@
           add: this.url('/company/create'),
           edit: this.url('/company/'),
           getAllCompanies: this.url('/api/getAllCompanies'),
-          saveForm: this.url('/api/purchase/addConfirmLog'),
+          getConfirmLog: this.url('/api/purchase/getConfirmLog'),
+          submitForm: this.url('/inventory/import')
         }
       }
     },
@@ -162,7 +159,7 @@
             return true;
           }
 
-          if (value.company.id === this.productsFilter) {
+          if (value.product_company_id === this.productsFilter) {
             return true;
           } else {
             return false;
@@ -204,10 +201,12 @@
         })
       },
       getProducts() {
-        this.$http.get(this.url('/api/getProducts'), {
+        this.$http.get(this.urls.getConfirmLog, {
           params: {
-            companyType: 0,
-            limit: 100
+            productCompanyId: this.productsFilter,
+            limit: 100,
+            sort: 'id',
+            order: 'desc'
           }
         }).then(response => {
           this.products = response.data.rows;
@@ -228,31 +227,30 @@
       },
       submitReceipt() {
         var form = {
-          company_id: this.companyType,
+          company_id: this.form.companyId,
           rows: []
         };
 
         form.rows = this.tableRows.map((row, index) => {
           return {
-            product_id: row.id,
+            product_id: row.product_id,
             batch: row.batch,
             expire: row.expire,
-            num: row.num2,
-            price: row.price,
-            batch2: row.batch2,
-            company_id: row.company_id,
-            company_audit: row.company_audit,
-            package_status: row.package_status,
-            conclusion: row.conclusion,
-            confirm_person: row.confirm_person
+            num: row.num,
+            price: row.price
           };
         });
 
-        this.$http.post(this.urls.saveForm, form).then(
-          response => {
-            console.log(response);
+        this.$http.post(this.urls.submitForm, form).then(response => {
+          if (response.data.error === 0) {
+            this.$message.success(response.data.msg || '操作成功');
+            this.$router.push('/receipt');
+            return;
           }
-        );
+
+          console.log(response);
+          this.$message.error(response.data.msg || '请求错误');
+        });
       }
     },
     created() {

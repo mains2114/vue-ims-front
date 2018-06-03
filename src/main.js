@@ -23,7 +23,7 @@ const routes = [
   // { path: '/purchaseManage/purchasePlan', component: () => import('./Import.vue') },
   { path: '/purchaseManage/ConfirmForm', component: () => import('./ConfirmForm.vue') },
   { path: '/purchaseManage/ConfirmLog', component: () => import('./ConfirmLog.vue') },
-  { path: '/purchaseManage/purchaseImport', component: () => import('./Import.vue') },
+  { path: '/purchaseManage/ConfirmImport', component: () => import('./ConfirmImport.vue') },
 ];
 
 const router = new Router({

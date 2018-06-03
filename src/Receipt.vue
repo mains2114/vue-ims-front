@@ -94,6 +94,10 @@
         <el-table-column align="center" prop="batch" label="生产批号" :width="90"></el-table-column>
         <el-table-column align="center" prop="expire" label="有效期" :width="100"></el-table-column>
       </el-table>
+
+      <span slot="footer">
+        <el-button type="text" @click="exportReceipt(form.id)">导出单据</el-button>
+      </span>
     </el-dialog>
   </div>
 </template>
@@ -125,6 +129,9 @@
       };
     },
     methods: {
+      exportReceipt(receiptId) {
+        window.open(this.url('/receipt/export/' + receiptId))
+      },
       getRows() {
         this.loading = true;
 
