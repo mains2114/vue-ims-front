@@ -90,9 +90,9 @@
     </el-row>
 
     <el-dialog title="选择货物" :visible.sync="dialogFormVisible">
-      <el-form :model="form" inline>
+      <el-form inline>
         <el-form-item label="生产商" :label-width="formLabelWidth">
-          <el-select v-model="productsFilter" placeholder="请选择生产商">
+          <el-select v-model="productsFilter" placeholder="请选择生产商" filterable>
             <el-option v-for="company in companies"
                        v-if="company.type === 'manufacturer'"
                        :key="company.id"
@@ -151,7 +151,7 @@
           add: this.url('/company/create'),
           edit: this.url('/company/'),
           getAllCompanies: this.url('/api/getAllCompanies'),
-          saveForm: this.url('/api/purchase/addConfirmLog'),
+          submitForm: this.url('/api/purchase/addConfirmLog'),
         }
       }
     },
@@ -207,7 +207,7 @@
         this.$http.get(this.url('/api/getProducts'), {
           params: {
             companyType: 0,
-            limit: 100
+            limit: 500 // todo add filter
           }
         }).then(response => {
           this.products = response.data.rows;
@@ -248,11 +248,16 @@
           };
         });
 
-        this.$http.post(this.urls.saveForm, form).then(
-          response => {
-            console.log(response);
+        this.$http.post(this.urls.submitForm, form).then(response => {
+          if (response.data.error === 0) {
+            this.$message.success(response.data.msg || '操作成功');
+            this.$router.push('/purchaseManage/confirmLog');
+            return;
           }
-        );
+
+          console.log(response);
+          this.$message.error(response.data.msg || '请求错误');
+        });
       }
     },
     created() {

@@ -200,7 +200,7 @@
         this.$http.get(this.url('/api/getProducts'), {
           params: {
             companyType: 0,
-            limit: 100
+            limit: 500 // todo add filter
           }
         }).then(response => {
           this.products = response.data.rows;
