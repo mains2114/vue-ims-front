@@ -37,11 +37,11 @@
       <el-table-column prop="package_status" label="包装情况"></el-table-column>
       <el-table-column prop="conclusion" label="结论"></el-table-column>
       <el-table-column prop="confirm_person" label="验收人"></el-table-column>
-      <!--<el-table-column label="操作">-->
-        <!--<template slot-scope="scope">-->
-          <!--<el-button size="small" @click="openFormEdit(scope.row)" type="text">编辑</el-button>-->
-        <!--</template>-->
-      <!--</el-table-column>-->
+      <el-table-column label="操作">
+        <template slot-scope="scope">
+          <el-button size="small" @click="openFormEdit(scope.row)" type="text">编辑</el-button>
+        </template>
+      </el-table-column>
     </el-table>
     <br>
 
@@ -54,49 +54,62 @@
                    :page-sizes="[10, 20, 50]">
     </el-pagination>
 
-    <el-dialog :title="formMode === 'edit' ? '编辑货品' : '添加货品'" :visible.sync="formVisible">
+    <el-dialog :title="formMode === 'edit' ? '编辑' : '添加货品'" :visible.sync="formVisible">
       <el-form ref="form" v-model="form" label-position="left" label-width="110px">
         <el-form-item label="编号" v-if="formMode === 'edit'">
           <el-input v-model="form.id" disabled></el-input>
         </el-form-item>
 
-        <el-form-item label="货品名称">
-          <el-input v-model="form.name"></el-input>
-          请输入最直接的货品名称（如输液器），注意不要添加规格、厂家之类的额外信息。请输入2-50个字符。
+        <el-form-item label="生产厂家">
+          <el-input v-model="form.manufacturer" disabled=""></el-input>
         </el-form-item>
-        <el-form-item label="规格型号">
-          <el-input v-model="form.model"></el-input>
-          请输入描述该货品规格的字符。请输入2-50个字符。
+        <el-form-item label="品名">
+          <el-input v-model="form.product_name" disabled=""></el-input>
         </el-form-item>
-        <el-form-item label="生产厂商">
-          <el-select v-model="form.company_id" filterable>
-            <el-option v-for="item in companies"
-                       v-if="item.type === 'manufacturer'"
-                       :key="item.id"
-                       :value="item.id"
-                       :label="item.id + '. ' + item.name">
-            </el-option>
-          </el-select>
-          <br>
-          请从下拉列表中选择该货品的生产厂商。如果没有你想选择的厂商，请前往添加。
+        <el-form-item label="规格">
+          <el-input v-model="form.product_model" disabled=""></el-input>
         </el-form-item>
 
-        <el-form-item label="基本单位">
-          <el-input v-model="form.unit"></el-input>
-          货品出库入库时，使用的最基本的单位（如，箱）。
+        <el-form-item label="价格">
+          <el-input v-model="form.price"></el-input>
         </el-form-item>
-        <el-form-item label="参考价格（元）">
-          <el-input-number v-model="form.price" :step="0.001" :min="0"></el-input-number>
-          针对基本单位的单价，该价格仅供参考。最多保留三位小数。
+        <el-form-item label="数量">
+          <el-input v-model="form.num"></el-input>
         </el-form-item>
-        <el-form-item label="批准文号">
-          <el-input v-model="form.approval"></el-input>
+
+        <el-form-item label="生产批号">
+          <el-input v-model="form.batch"></el-input>
         </el-form-item>
-        <el-form-item label="中标号">
-          <el-input v-model="form.bid"></el-input>
+        <el-form-item label="灭菌批号">
+          <el-input v-model="form.batch2"></el-input>
         </el-form-item>
-        <el-form-item label="生产许可证">
-          <el-input v-model="form.permit"></el-input>
+        <el-form-item label="有效期">
+          <el-date-picker type="date" v-model="form.expire" placeholder="选择日期"
+                          value-format="yyyy-MM-dd">
+          </el-date-picker>
+        </el-form-item>
+        <el-form-item label="供货单位">
+          <el-select v-model="form.company_id" filterable="">
+            <el-option-group v-for="group in companiesGrouped"
+                             :key="group.label"
+                             :label="group.label">
+              <el-option v-for="company in group.children"
+                         :key="company.id" :value="company.id" :label="company.id + '. ' + company.name">
+              </el-option>
+            </el-option-group>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="资质证明">
+          <el-input v-model="form.company_audit"></el-input>
+        </el-form-item>
+        <el-form-item label="包装情况">
+          <el-input v-model="form.package_status"></el-input>
+        </el-form-item>
+        <el-form-item label="结论">
+          <el-input v-model="form.conclusion"></el-input>
+        </el-form-item>
+        <el-form-item label="验收人">
+          <el-input v-model="form.confirm_person"></el-input>
         </el-form-item>
 
         <el-form-item>
@@ -120,6 +133,7 @@
     name: "Company",
     data() {
       return {
+        loading: false,
         companyId: '',
         companies: [],
         rows: [],
@@ -134,13 +148,57 @@
         urls: {
           getRows: this.url('/api/purchase/getConfirmLog'),
           add: this.url('/product/create'),
-          edit: this.url('/product/'),
+          edit: this.url('/api/purchase/editConfirmLog'),
           getAllCompanies: this.url('/api/getAllCompanies')
         }
       };
     },
+    computed: {
+      productsFiltered() {
+        return this.products.filter((value) => {
+          if (!this.productsFilter) {
+            return true;
+          }
+
+          if (value.company.id === this.productsFilter) {
+            return true;
+          } else {
+            return false;
+          }
+        })
+      },
+      companiesGrouped() {
+        let group = {
+          manufacturer: {
+            label: '生产商',
+            children: [],
+          },
+          seller: {
+            label: '销售商',
+            children: [],
+          },
+          customer: {
+            label: '顾客',
+            children: [],
+          }
+        };
+
+        _.each(this.companies, company => {
+          group[ company.type ].children.push(company);
+        });
+
+        return group;
+      }
+    },
+    filters: {
+      toFixed(num, precision = 2) {
+        return num.toFixed(precision);
+      }
+    },
     methods: {
       getRows() {
+        this.loading = true;
+
         this.$http.get(this.urls.getRows, {
           params: {
             sort: 'id',
@@ -152,6 +210,8 @@
         }).then(response => {
           this.rows = response.data.rows || [];
           this.total = response.data.total || 0;
+
+          this.loading = false;
         })
       },
       getAllCompanies() {
@@ -174,7 +234,7 @@
       },
       openFormEdit(item) {
         this.formMode = 'edit';
-        this.form = item;
+        this.form = Object.assign({}, item);
         this.formVisible = true;
       },
       openDialog2(rows) {
@@ -184,12 +244,18 @@
       submitForm() {
         let url = this.formMode === 'add'
           ? this.urls.add
-          : this.urls.edit + this.form.id;
+          : this.urls.edit;
 
         this.$http.post(url, this.form).then(response => {
-          this.$message.success(response);
-          this.formVisible = false;
-          this.getRows();
+          if (response.data.error === 0) {
+            this.$message.success(response.data.msg || '操作成功');
+            this.formVisible = false;
+            this.getRows();
+            return;
+          }
+
+          console.log(response);
+          this.$message.error(response.data.msg || '请求错误');
         });
       }
     },

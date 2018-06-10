@@ -51,7 +51,9 @@
       </el-table-column>
       <el-table-column prop="expire" label="有效期" width="165">
         <template slot-scope="scope">
-          <el-date-picker type="date" v-model="scope.row.expire" size="small" placeholder="选择日期"></el-date-picker>
+          <el-date-picker type="date" v-model="scope.row.expire" size="small" placeholder="选择日期"
+                          value-format="yyyy-MM-dd">
+          </el-date-picker>
         </template>
       </el-table-column>
       <el-table-column prop="total" label="总价" width="100">
