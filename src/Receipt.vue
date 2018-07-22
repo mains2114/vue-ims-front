@@ -4,7 +4,7 @@
     <p>所有货品出库、入库的单据都可以在这里查看。</p>
 
     <el-row>
-      <el-col :span="12">
+      <el-col :span="24">
         <el-button type="primary" @click="$router.push('import')">入库</el-button>
         <el-button type="primary" @click="$router.push('export')">出库</el-button>
 
@@ -20,8 +20,12 @@
           <el-option value="in" label="入库"></el-option>
           <el-option value="out" label="出库"></el-option>
         </el-select>
+
+        <el-input v-model="receiptSearch" placeholder="输入单据ID" clearable="" style="width: 180px;"></el-input>
+
+        <el-button type="primary" @click="handleSelectChange">搜索</el-button>
       </el-col>
-      <el-col :span="12"></el-col>
+      <!--<el-col :span="12"></el-col>-->
     </el-row>
     <br>
 
@@ -111,6 +115,7 @@
         companyId: '',
         companies: [],
         receiptType: '',
+        receiptSearch: '',
         rows: [],
         total: 0,
         pageSize: 10,
@@ -142,6 +147,7 @@
             offset: this.pageSize * (this.page - 1),
             limit: this.pageSize,
             companyId: this.companyId,
+            search: this.receiptSearch,
             type: this.receiptType
           }
         }).then(response => {

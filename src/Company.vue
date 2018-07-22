@@ -3,7 +3,7 @@
     <h3>公司信息</h3>
 
     <el-row>
-      <el-col :span="12">
+      <el-col :span="24">
         <el-button type="primary" @click="openFormAdd()">添加</el-button>
 
         <el-select v-model="companyType" @change="handleSelectChange">
@@ -12,8 +12,12 @@
           <el-option value="customer" label="仅显示顾客"></el-option>
           <el-option value="seller" label="仅显示销售商"></el-option>
         </el-select>
+
+        <el-input v-model="companySearch" placeholder="请输入公司名称" clearable="" style="width: 180px;"></el-input>
+
+        <el-button type="primary" @click="handleSelectChange">搜索</el-button>
       </el-col>
-      <el-col :span="12"></el-col>
+      <!--<el-col :span="12"></el-col>-->
     </el-row>
     <br>
 
@@ -103,6 +107,7 @@
           customer: '顾客',
         },
         companyType: '',
+        companySearch: '',
         rows: [],
         total: 0,
         pageSize: 10,
@@ -129,6 +134,7 @@
             order: 'desc',
             offset: this.pageSize * (this.page - 1),
             limit: this.pageSize,
+            search: this.companySearch,
             type: this.companyType
           }
         }).then(response => {
