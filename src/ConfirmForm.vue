@@ -43,7 +43,7 @@
       </el-table-column>
       <el-table-column prop="company_id" label="供货单位" width="200">
         <template slot-scope="scope">
-          <el-select v-model="scope.row.company_id" size="small">
+          <el-select v-model="scope.row.company_id" size="small" filterable="">
             <el-option-group v-for="group in companiesGrouped"
                              :key="group.label"
                              :label="group.label">
