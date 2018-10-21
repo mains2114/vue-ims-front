@@ -14,6 +14,10 @@
                      :label="item.id + '. ' + item.name">
           </el-option>
         </el-select>
+
+        <el-input v-model="productSearch" placeholder="请输入货品名称" clearable="" style="width: 180px;"></el-input>
+
+        <el-button type="primary" @click="handleSelectChange">搜索</el-button>
       </el-col>
       <el-col :span="12"></el-col>
     </el-row>
@@ -127,6 +131,7 @@
         loading: false,
         companyId: '',
         companies: [],
+        productSearch: '',
         rows: [],
         total: 0,
         pageSize: 10,
@@ -155,6 +160,7 @@
             order: 'desc',
             offset: this.pageSize * (this.page - 1),
             limit: this.pageSize,
+            search: this.productSearch,
             company_id: this.companyId
           }
         }).then(response => {
