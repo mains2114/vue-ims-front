@@ -11,10 +11,10 @@
   },
   "dependencies": {
     "axios": "^0.18.0",
-    "element-ui": "^2.3.6",
-    "lodash": "^4.17.5",
-    "vue": "^2.5.16",
-    "vue-router": "^3.0.1"
+    "element-ui": "^2.4.11",
+    "lodash": "^4.17.11",
+    "vue": "^2.5.21",
+    "vue-router": "^3.0.2"
   },
   "browserslist": [
     "> 1%",
@@ -30,6 +30,7 @@
     "cross-env": "^5.1.4",
     "css-loader": "^0.28.11",
     "file-loader": "^1.1.11",
+    "html-webpack-plugin": "^3.2.0",
     "url-loader": "^0.6.2",
     "vue-loader": "^13.0.5",
     "vue-template-compiler": "^2.5.16",

@@ -1,12 +1,19 @@
-var path = require('path')
-var webpack = require('webpack')
+var path = require('path');
+var webpack = require('webpack');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
   entry: './src/main.js',
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: './index.html'
+    })
+  ],
   output: {
     path: path.resolve(__dirname, './dist'),
     publicPath: '/dist/',
-    filename: 'build.js'
+    filename: '[name].[hash].js',
+    chunkFilename: '[name].[chunkhash].js'
   },
   module: {
     rules: [
@@ -54,18 +61,14 @@ module.exports = {
     extensions: ['*', '.js', '.vue', '.json']
   },
   devServer: {
+    port: 8081,
+    openPage: 'dist/',
     historyApiFallback: true,
     noInfo: true,
     overlay: true,
-    proxy: [
-      {
-        context: '/php',
-        target: 'http://ims.local:8080',
-        router: {
-          'localhost:8081/php': 'http://ims.local:8080/'
-        }
-      }
-    ]
+    proxy: {
+      '/api': 'http://ims.local:8080'
+    }
   },
   performance: {
     hints: false
