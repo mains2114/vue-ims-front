@@ -94,9 +94,8 @@
     <el-dialog title="选择货物" :visible.sync="dialogFormVisible">
       <el-form inline>
         <el-form-item label="生产商" :label-width="formLabelWidth">
-          <el-select v-model="productsFilter" placeholder="请选择生产商" filterable>
-            <el-option v-for="company in companies"
-                       v-if="company.type === 'manufacturer'"
+          <el-select v-model="productsFilter" placeholder="请选择生产商" filterable @change="getProducts">
+            <el-option v-for="company in computedManufacturer"
                        :key="company.id"
                        :value="company.id"
                        :label="company.id + '. ' + company.name">
@@ -192,6 +191,11 @@
         });
 
         return group;
+      },
+      computedManufacturer() {
+        return _.filter(this.companies, company => {
+          return company.type === 'manufacturer';
+        });
       }
     },
     filters: {
@@ -208,8 +212,8 @@
       getProducts() {
         this.$http.get(this.url('/api/getProducts'), {
           params: {
-            companyType: 0,
-            limit: 500 // todo add filter
+            company_id: this.productsFilter,
+            limit: 100
           }
         }).then(response => {
           this.products = response.data.rows;
