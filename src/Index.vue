@@ -33,7 +33,7 @@
       <router-view></router-view>
     </el-main>
     <el-footer>
-      <p style="text-align: center;">ims-laravel © 2017</p>
+      <p style="text-align: center;">ims-laravel © 2017 - 2022</p>
     </el-footer>
   </el-container>
 </template>

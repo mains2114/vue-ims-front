@@ -4,8 +4,8 @@
 
     <el-row>
       <el-col :span="24">
-        <el-button type="primary" @click="openFormAdd()">入库</el-button>
-        <el-button type="primary" @click="openFormAdd()">出库</el-button>
+        <el-button type="primary" @click="$router.push('import')">入库</el-button>
+        <el-button type="primary" @click="$router.push('export')">出库</el-button>
 
         <!--<el-select v-model="companyId" @change="handleSelectChange" filterable clearable placeholder="请选择生产商">-->
           <!--<el-option v-for="item in companies"-->
@@ -35,11 +35,16 @@
 
     <el-table :data="rows" border>
       <!--<el-table-column type="selection"></el-table-column>-->
+      <el-table-column prop="id" label="编号" width="70"></el-table-column>
       <el-table-column prop="manufacturer" label="生产厂商"></el-table-column>
       <el-table-column prop="product_name" label="货品"></el-table-column>
       <el-table-column prop="product_model" label="型号"></el-table-column>
       <el-table-column prop="batch" label="生产批次"></el-table-column>
-      <el-table-column prop="receipt_type" label="操作类型"></el-table-column>
+      <el-table-column prop="receipt_type" label="操作类型">
+        <template slot-scope="scope">
+          {{ scope.row.receipt_type === 'in' ? '入库' : '出库' }}
+        </template>
+      </el-table-column>
       <el-table-column prop="num" label="数量"></el-table-column>
       <el-table-column prop="product_unit" label="单位"></el-table-column>
       <el-table-column prop="receipt_time" label="操作时间"></el-table-column>

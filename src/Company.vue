@@ -37,7 +37,11 @@
       <el-table-column label="操作">
         <template slot-scope="scope">
           <el-button size="small" @click="openFormEdit(scope.row)" type="text">编辑</el-button>
-          <el-button size="small" @click="deleteRows('company', [scope.row.id])" type="text">删除</el-button>
+          <el-popconfirm title="确认删除？"
+            @confirm="deleteRows('company', [scope.row.id])"
+          >
+            <el-button slot="reference" size="small" type="text">删除</el-button>
+          </el-popconfirm>
         </template>
       </el-table-column>
     </el-table>

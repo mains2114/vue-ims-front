@@ -3,7 +3,7 @@
     <h3>货品信息</h3>
 
     <el-row>
-      <el-col :span="12">
+      <el-col :span="24">
         <el-button type="primary" @click="openFormAdd()">添加</el-button>
 
         <el-select v-model="companyId" @change="handleSelectChange" filterable clearable placeholder="请选择生产商">
@@ -47,7 +47,11 @@
       <el-table-column label="操作">
         <template slot-scope="scope">
           <el-button size="small" @click="openFormEdit(scope.row)" type="text">编辑</el-button>
-          <el-button size="small" @click="deleteRows('product', [scope.row.id])" type="text">删除</el-button>
+          <el-popconfirm title="确认删除？"
+            @confirm="deleteRows('product', [scope.row.id])"
+          >
+            <el-button slot="reference" size="small" type="text">删除</el-button>
+          </el-popconfirm>
         </template>
       </el-table-column>
     </el-table>

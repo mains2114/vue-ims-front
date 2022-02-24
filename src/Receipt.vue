@@ -42,7 +42,11 @@
       <el-table-column label="操作">
         <template slot-scope="scope">
           <el-button size="small" @click="openFormEdit(scope.row)" type="text">查看</el-button>
-          <el-button size="small" @click="deleteRows('receipt', [scope.row.id])" type="text">删除</el-button>
+          <el-popconfirm title="确认删除？"
+            @confirm="deleteRows('receipt', [scope.row.id])"
+          >
+            <el-button slot="reference" size="small" type="text">删除</el-button>
+          </el-popconfirm>
         </template>
       </el-table-column>
     </el-table>
@@ -57,7 +61,7 @@
                    :page-sizes="[10, 20, 50]">
     </el-pagination>
 
-    <el-dialog :title="formMode === 'edit' ? '查看单据' : '查看单据'" :visible.sync="formVisible">
+    <el-dialog :title="formMode === 'edit' ? '查看单据' : '查看单据'" :visible.sync="formVisible" width="70%">
       <el-form v-model="form" inline label-position="left" label-width="80px" disabled>
         <el-form-item label="单据编号" v-if="formMode === 'edit'">
           <el-input v-model="form.id" disabled></el-input>
