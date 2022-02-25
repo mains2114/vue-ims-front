@@ -67,7 +67,7 @@ module.exports = {
     noInfo: true,
     overlay: true,
     proxy: {
-      '/api': 'http://127.0.0.1:8080'
+      '/api': 'http://127.0.0.1:8000'
     }
   },
   performance: {

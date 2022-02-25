@@ -206,9 +206,10 @@
       },
       chooseProducts() {
         var selectedRows = this.productsSelected.map(item => {
-          item.price = parseFloat(item.prefer_price);
-          item.num = parseFloat(item.num);
-          return item;
+          let newItem = _.clone(item);
+          newItem.price = parseFloat(item.prefer_price);
+          newItem.num = parseFloat(item.num);
+          return newItem;
         });
         this.tableRows = _.unionBy(this.tableRows, selectedRows, 'id');
         this.dialogFormVisible = false;
