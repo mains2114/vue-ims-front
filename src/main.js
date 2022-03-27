@@ -6,6 +6,10 @@ import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 import Index from './Index.vue'
 
+// 全局配置
+window.ims = {
+  enableReceiptEdit: false,
+};
 
 axios.interceptors.response.use(function (response) {
   // Do something with response data
@@ -39,6 +43,7 @@ const routes = [
   { path: '/purchaseManage/ConfirmForm', component: () => import('./ConfirmForm.vue') },
   { path: '/purchaseManage/ConfirmLog', component: () => import('./ConfirmLog.vue') },
   { path: '/purchaseManage/ConfirmImport', component: () => import('./ConfirmImport.vue') },
+  { path: '/changes', component: () => import('./Changes.vue') },
 ];
 
 const router = new Router({

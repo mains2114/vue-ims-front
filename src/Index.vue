@@ -16,6 +16,7 @@
           <el-menu-item index="/purchaseManage/confirmLog">验收记录</el-menu-item>
           <el-menu-item index="/purchaseManage/confirmImport">验收入库</el-menu-item>
         </el-submenu>
+        <el-menu-item index="/changes">更新日志</el-menu-item>
         <el-dropdown class="ims-user-info" @command="handleCommand">
           <span class="el-dropdown-link">
             {{ username }}

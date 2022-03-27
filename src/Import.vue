@@ -36,7 +36,7 @@
       <el-table-column prop="unit" label="单位" width="60"></el-table-column>
       <el-table-column prop="prefer_price" label="单价">
         <template slot-scope="scope">
-          <el-input v-model="scope.row.prefer_price" size="small"></el-input>
+          <el-input v-model="scope.row.price" size="small"></el-input>
         </template>
       </el-table-column>
       <el-table-column prop="num" label="数量">
@@ -58,7 +58,7 @@
       </el-table-column>
       <el-table-column prop="total" label="总价" width="100">
         <template slot-scope="scope">
-          {{ scope.row.price * (scope.row.num2 || 0) | toFixed(2) }}
+          {{ scope.row.price * (scope.row.num2 || 0) | toFixed(3) }}
         </template>
       </el-table-column>
       <el-table-column label="操作" width="80" fixed="right">
@@ -93,7 +93,7 @@
     <el-dialog title="选择货物" :visible.sync="dialogFormVisible" width="70%">
       <el-form inline>
         <el-form-item label="生产商" :label-width="formLabelWidth">
-          <el-select v-model="productsFilter" placeholder="请选择生产商" filterable>
+          <el-select v-model="productsFilter" @change="productFilterChange" placeholder="请选择生产商" filterable>
             <el-option v-for="company in companies"
                        v-if="company.type === 'manufacturer'"
                        :key="company.id"
@@ -202,17 +202,27 @@
         this.$http.get(this.url('/api/getProducts'), {
           params: {
             companyType: 0,
-            limit: 500 // todo add filter
+            company_id: this.productsFilter,
+            limit: 100
           }
         }).then(response => {
           this.products = response.data.rows;
         })
       },
+      productFilterChange() {
+        this.getProducts();
+      },
       productSelectedChange(rows) {
         this.productsSelected = rows;
       },
       chooseProducts() {
-        this.tableRows = _.unionBy(this.tableRows, this.productsSelected, 'id');
+        let selectedRows = this.productsSelected.map(item => {
+          let newItem = _.clone(item);
+          newItem.price = parseFloat(item.price);
+          // newItem.num = parseFloat(item.num);
+          return newItem;
+        });
+        this.tableRows = _.unionBy(this.tableRows, selectedRows, 'id');
         this.dialogFormVisible = false;
       },
       deleteTableRow(row) {
@@ -222,7 +232,7 @@
         );
       },
       submitReceipt() {
-        var form = {
+        let form = {
           company_id: this.form.companyId,
           rows: []
         };
@@ -251,7 +261,7 @@
     },
     created() {
       this.getManufacturers();
-      this.getProducts();
+      // this.getProducts();
     }
   }
 </script>

@@ -41,11 +41,12 @@
       </el-table-column>
       <el-table-column label="操作">
         <template slot-scope="scope">
-          <el-button size="small" @click="openFormEdit(scope.row)" type="text">查看</el-button>
+          <el-button size="small" @click="openFormView(scope.row)" type="text">查看</el-button>
+          <el-button size="small" @click="openFormEdit(scope.row)" type="text" v-if="methodIsEnableEdit(scope.row)">修改</el-button>
           <el-popconfirm title="确认删除？"
             @confirm="deleteRows('receipt', [scope.row.id])"
           >
-            <el-button slot="reference" size="small" type="text">删除</el-button>
+            <el-button slot="reference" size="small" type="text" style="margin-left: 10px;">删除</el-button>
           </el-popconfirm>
         </template>
       </el-table-column>
@@ -61,24 +62,27 @@
                    :page-sizes="[10, 20, 50]">
     </el-pagination>
 
-    <el-dialog :title="formMode === 'edit' ? '查看单据' : '查看单据'" :visible.sync="formVisible" width="70%">
-      <el-form v-model="form" inline label-position="left" label-width="80px" disabled>
-        <el-form-item label="单据编号" v-if="formMode === 'edit'">
-          <el-input v-model="form.id" disabled></el-input>
+    <el-dialog :title="computedIsEdit ? '修改单据' : '查看单据'" :visible.sync="formVisible" width="70%">
+      <el-form v-model="form" inline label-position="left" label-width="80px">
+        <el-form-item label="单据编号">
+          <el-input v-model="form.formatted_no" disabled></el-input>
         </el-form-item>
         <el-form-item label="制单时间">
-          <el-date-picker type="date" v-model="form.date"></el-date-picker>
+          <el-input v-model="form.date" disabled></el-input>
         </el-form-item>
         <el-form-item label="购货单位">
-          <el-select v-model="form.company_id" filterable>
-            <el-option v-for="item in companies"
-                       :key="item.id"
-                       :value="item.id"
-                       :label="item.id + '. ' + item.name">
-            </el-option>
-          </el-select>
+          <el-input v-model="form.company_name" disabled></el-input>
+<!--          <el-select v-model="form.company_id" filterable disabled>-->
+<!--            <el-option v-for="item in companies"-->
+<!--                       :key="item.id"-->
+<!--                       :value="item.id"-->
+<!--                       :label="item.id + '. ' + item.name">-->
+<!--            </el-option>-->
+<!--          </el-select>-->
         </el-form-item>
-      </el-form>
+        <el-form-item label="单据类型">
+          <el-input :value="form.type === 'in' ? '入库' : '出库'" disabled></el-input>
+        </el-form-item>
 
       <el-table :data="formRows">
         <el-table-column align="center" prop="product.name" label="品名及规格" width="240px">
@@ -87,24 +91,44 @@
           </template>
         </el-table-column>
         <el-table-column align="center" prop="product.company.name" label="厂家"></el-table-column>
-        <el-table-column align="center" prop="product.unit" label="单位"></el-table-column>
+        <el-table-column align="center" prop="product.unit" label="单位" width="80px"></el-table-column>
         <el-table-column align="center" prop="num" label="数量">
           <template slot-scope="scope">
-            {{ Math.abs(scope.row.num) }}
+            <el-input type="text" v-model="scope.row.num" v-if="computedIsEdit"></el-input>
+            <span v-else>{{ scope.row.num }}</span>
           </template>
         </el-table-column>
-        <el-table-column align="center" prop="price" label="单价"></el-table-column>
+        <el-table-column align="center" prop="price" label="单价">
+          <template slot-scope="scope">
+            <el-input type="text" v-model="scope.row.price" v-if="computedIsEdit"></el-input>
+            <span v-else>{{ scope.row.price }}</span>
+          </template>
+        </el-table-column>
         <el-table-column align="center" label="金额">
           <template slot-scope="scope">
             {{ Math.abs(scope.row.num * scope.row.price).toFixed(3) }}
           </template>
         </el-table-column>
-        <el-table-column align="center" prop="batch" label="生产批号" :width="90"></el-table-column>
-        <el-table-column align="center" prop="expire" label="有效期" :width="100"></el-table-column>
+        <el-table-column align="center" prop="batch" label="生产批号" min-width="100px">
+          <template slot-scope="scope">
+            <el-input type="text" v-model="scope.row.batch" v-if="computedIsEdit"></el-input>
+            <span v-else>{{ scope.row.batch }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column align="center" prop="expire" label="有效期" min-width="100px">
+          <template slot-scope="scope">
+            <el-date-picker type="date" v-model="scope.row.expire" v-if="computedIsEdit"></el-date-picker>
+            <span v-else>{{ scope.row.expire }}</span>
+          </template>
+        </el-table-column>
       </el-table>
 
+      </el-form>
+
       <span slot="footer">
-        <el-button type="text" @click="exportReceipt(form.id)">导出单据</el-button>
+        <el-button type="success" @click="formVisible = false" v-if="computedIsEdit">取消</el-button>
+        <el-button type="danger" @click="submitForm()" v-if="computedIsEdit">保存</el-button>
+        <el-button type="primary" @click="exportReceipt(form.id)" v-else>导出单据</el-button>
       </span>
     </el-dialog>
   </div>
@@ -131,13 +155,23 @@
         urls: {
           getRows: this.url('/api/getReceipts'),
           delRows: this.url('/api/delRecords'),
-          add: this.url('/product/create'),
-          edit: this.url('/product/'),
+          add: this.url('/receipt/create'),
+          edit: this.url('/api/inventory/saveReceiptChangeV2'),
           getAllCompanies: this.url('/api/getAllCompanies')
         }
       };
     },
+    computed: {
+      computedIsEdit() {
+        return this.formMode === 'edit';
+      },
+    },
     methods: {
+      methodIsEnableEdit(row) {
+        // 允许修改最近1天创建的单据
+        let isRecent = new Date(row.created_at).getTime() + 86400 * 1000 > new Date().getTime();
+        return isRecent || (window.ims && window.ims.enableReceiptEdit);
+      },
       exportReceipt(receiptId) {
         window.open(this.url('/receipt/export/' + receiptId))
       },
@@ -197,18 +231,44 @@
         this.form = {};
         this.formVisible = true;
       },
+      openFormView(item) {
+        this.formMode = 'view';
+        this.form = item;
+        this.formRows = _.map(item.inventories || [], (item) => {
+          let tmp = _.clone(item);
+          tmp.num = Math.abs(item.num);
+          return tmp;
+        });
+        this.formVisible = true;
+      },
       openFormEdit(item) {
         this.formMode = 'edit';
         this.form = item;
-        this.formRows = item.inventories || [];
+        this.formRows = _.map(item.inventories || [], (item) => {
+          let tmp = _.clone(item);
+          tmp.num = Math.abs(item.num);
+          return tmp;
+        });
         this.formVisible = true;
       },
       submitForm() {
         let url = this.formMode === 'add'
           ? this.urls.add
-          : this.urls.edit + this.form.id;
+          : this.urls.edit;
+        let formData = {
+          id: this.form.id,
+          rows: _.map(this.formRows, (item) => {
+            return {
+              id: item.id,
+              num: item.num,
+              price: item.price,
+              batch: item.batch,
+              expire: item.expire,
+            };
+          }),
+        };
 
-        this.$http.post(url, this.form).then(response => {
+        this.$http.post(url, formData).then(response => {
           if (response.data.error === 0) {
             this.$message.success(response.data.msg || '操作成功');
             this.formVisible = false;
