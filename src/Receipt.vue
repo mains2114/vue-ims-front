@@ -5,7 +5,7 @@
 
     <el-row>
       <el-col :span="24">
-        <el-button type="primary" @click="$router.push('import')">入库</el-button>
+        <!-- <el-button type="primary" @click="$router.push('import')">入库</el-button> -->
         <el-button type="primary" @click="$router.push('export')">出库</el-button>
 
         <el-select v-model="companyId" @change="handleSelectChange" filterable clearable placeholder="请选择公司">
