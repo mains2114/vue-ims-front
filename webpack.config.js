@@ -61,14 +61,20 @@ module.exports = {
     extensions: ['*', '.js', '.vue', '.json']
   },
   devServer: {
+    host: '127.0.0.1',
     port: 8081,
     openPage: 'dist/',
     historyApiFallback: true,
     noInfo: true,
     overlay: true,
-    proxy: {
-      '/api': 'http://127.0.0.1:8000'
-    }
+    proxy: [
+      {
+        context: ['/api', '/login'],
+        target: 'http://127.0.0.1:8000',
+        secure: false,
+        changeOrigin: true,
+      }
+    ]
   },
   performance: {
     hints: false
