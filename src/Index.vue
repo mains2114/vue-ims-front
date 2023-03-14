@@ -7,7 +7,7 @@
         <el-menu-item index="/product">货品与库存</el-menu-item>
         <el-menu-item index="/receipt">单据</el-menu-item>
         <el-menu-item index="/inventory">流水</el-menu-item>
-        <el-menu-item index="/import">入库</el-menu-item>
+        <!-- <el-menu-item index="/import">入库</el-menu-item> -->
         <el-menu-item index="/export">出库</el-menu-item>
         <el-submenu index="/importManage">
           <template slot="title">采购管理</template>

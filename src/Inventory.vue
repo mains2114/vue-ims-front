@@ -1,11 +1,11 @@
 <template>
   <div>
-    <h3>库存变更记录</h3>
+    <h3>货品流水</h3>
 
     <el-row>
       <el-col :span="24">
-        <el-button type="primary" @click="$router.push('import')">入库</el-button>
-        <el-button type="primary" @click="$router.push('export')">出库</el-button>
+        <!-- <el-button type="primary" @click="$router.push('import')">入库</el-button> -->
+        <!-- <el-button type="primary" @click="$router.push('export')">出库</el-button> -->
 
         <!--<el-select v-model="companyId" @change="handleSelectChange" filterable clearable placeholder="请选择生产商">-->
           <!--<el-option v-for="item in companies"-->

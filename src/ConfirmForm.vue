@@ -8,7 +8,7 @@
 
     <el-table border="" :data="tableRows">
       <el-table-column prop="id" label="验收日期" width="100">
-        <template slot-scope="scope">2018-05-27</template>
+        <template slot-scope="scope">-</template>
       </el-table-column>
       <el-table-column prop="name" label="品名及规格" width="200">
         <template slot-scope="scope">{{ scope.row.name + ' - ' + scope.row.model }}</template>
@@ -56,22 +56,66 @@
       </el-table-column>
       <el-table-column prop="company_audit" label="资质证明">
         <template slot-scope="scope">
-          <el-input v-model="scope.row.company_audit" size="small"></el-input>
+          <el-select v-model="scope.row.company_audit" size="small"
+            allow-create
+            filterable
+            default-first-option
+          >
+            <el-option
+              v-for="item in companyAuditOptions"
+              :key="item.value"
+              :label="item.value"
+              :value="item.value">
+            </el-option>
+          </el-select>
         </template>
       </el-table-column>
       <el-table-column prop="package_status" label="包装情况">
         <template slot-scope="scope">
-          <el-input v-model="scope.row.package_status" size="small"></el-input>
+          <el-select v-model="scope.row.package_status" size="small"
+            allow-create
+            filterable
+            default-first-option
+          >
+            <el-option
+              v-for="item in packageStatusOptions"
+              :key="item.value"
+              :label="item.value"
+              :value="item.value">
+            </el-option>
+          </el-select>
         </template>
       </el-table-column>
       <el-table-column prop="conclusion" label="结论">
         <template slot-scope="scope">
-          <el-input v-model="scope.row.conclusion" size="small"></el-input>
+          <el-select v-model="scope.row.conclusion" size="small"
+            allow-create
+            filterable
+            default-first-option
+          >
+            <el-option
+              v-for="item in conclusionOptions"
+              :key="item.value"
+              :label="item.value"
+              :value="item.value">
+            </el-option>
+          </el-select>
         </template>
       </el-table-column>
       <el-table-column prop="confirm_person" label="验收人">
         <template slot-scope="scope">
-          <el-input v-model="scope.row.confirm_person" size="small"></el-input>
+          <el-select v-model="scope.row.confirm_person" size="small"
+            allow-create
+            filterable
+            default-first-option
+          >
+            <el-option
+              v-for="item in confirmPersonOptions"
+              :key="item.value"
+              :label="item.value"
+              :value="item.value">
+            </el-option>
+          </el-select>
         </template>
       </el-table-column>
 
@@ -146,6 +190,21 @@
         productsFilter: null,
         products: [],
         productsSelected: [],
+        companyAuditOptions: [
+          {value: "齐全"},
+          {value: "缺失"},
+        ],
+        packageStatusOptions: [
+          {value: "良好"},
+          {value: "破损"},
+        ],
+        conclusionOptions: [
+          {value: "合格"},
+          {value: "不合格"},
+        ],
+        confirmPersonOptions: [
+          {value: "黄海芳"},
+        ],
         components: {},
         urls: {
           getRows: this.url('/api/getCompanies'),
