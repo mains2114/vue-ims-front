@@ -19,9 +19,9 @@
           <el-input v-model="scope.row.num2" size="small"></el-input>
         </template>
       </el-table-column>
-      <el-table-column prop="prefer_price" label="单价">
+      <el-table-column prop="price" label="单价">
         <template slot-scope="scope">
-          <el-input v-model="scope.row.prefer_price" size="small"></el-input>
+          <el-input v-model="scope.row.price" size="small"></el-input>
         </template>
       </el-table-column>
       <el-table-column prop="batch" label="生产批号">
@@ -282,12 +282,18 @@
         this.productsSelected = rows;
       },
       chooseProducts() {
-        this.tableRows = _.unionBy(this.tableRows, this.productsSelected, 'id');
+        let selectedRows = this.productsSelected.map(item => {
+          let newItem = _.clone(item);
+          // newItem.price = parseFloat(item.prefer_price);
+          // newItem.num = parseFloat(item.num);
+          return newItem;
+        });
+        this.tableRows = _.unionBy(this.tableRows, selectedRows, 'id');
         this.dialogFormVisible = false;
       },
       deleteTableRow(row) {
         this.tableRows.splice(
-          _.findIndex(this.tableRows, o => o.id = row.id),
+          _.findIndex(this.tableRows, o => o.id == row.id),
           1
         );
       },

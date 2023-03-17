@@ -216,7 +216,7 @@
       },
       deleteTableRow(row) {
         this.tableRows.splice(
-          _.findIndex(this.tableRows, o => o.id = row.id),
+          _.findIndex(this.tableRows, o => o.id == row.id),
           1
         );
       },
