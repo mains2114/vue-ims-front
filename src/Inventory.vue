@@ -7,14 +7,13 @@
         <!-- <el-button type="primary" @click="$router.push('import')">入库</el-button> -->
         <!-- <el-button type="primary" @click="$router.push('export')">出库</el-button> -->
 
-        <!--<el-select v-model="companyId" @change="handleSelectChange" filterable clearable placeholder="请选择生产商">-->
-          <!--<el-option v-for="item in companies"-->
-                     <!--v-if="item.type === 'manufacturer'"-->
-                     <!--:key="item.id"-->
-                     <!--:value="item.id"-->
-                     <!--:label="item.id + '. ' + item.name">-->
-          <!--</el-option>-->
-        <!--</el-select>-->
+        <el-select v-model="companyId" @change="handleSelectChange" filterable clearable placeholder="请选择交易公司">
+          <el-option v-for="item in companies"
+                     :key="item.id"
+                     :value="item.id"
+                     :label="item.id + '. ' + item.name">
+          </el-option>
+        </el-select>
 
         <el-cascader v-model="productTreeVal" :options="productTree" placeholder="请选择货品"
                      expand-trigger="click"
@@ -28,12 +27,14 @@
           <el-option value="in" label="入库"></el-option>
           <el-option value="out" label="出库"></el-option>
         </el-select>
+        
+        <el-button type="primary" @click="handleSelectChange">搜索</el-button>
       </el-col>
       <!--<el-col :span="12"></el-col>-->
     </el-row>
     <br>
 
-    <el-table :data="rows" border>
+    <el-table :data="rows" border v-loading="loading">
       <!--<el-table-column type="selection"></el-table-column>-->
       <el-table-column prop="id" label="编号" width="70"></el-table-column>
       <el-table-column prop="manufacturer" label="生产厂商"></el-table-column>
@@ -112,6 +113,7 @@
     name: "Company",
     data() {
       return {
+        loading: false,
         companyId: '',
         companies: [],
         productId: '',
@@ -137,19 +139,22 @@
     },
     methods: {
       getRows() {
+        this.loading = true;
         this.$http.get(this.urls.getRows, {
           params: {
             sort: 'id',
             order: 'desc',
             offset: this.pageSize * (this.page - 1),
             limit: this.pageSize,
-            productCompany: this.companyId,
+            companyId: this.companyId,
             receiptType: this.receiptType,
-            product: this.productId
+            // productCompany: this.productTreeVal[0],
+            product: this.productTreeVal[1]
           }
         }).then(response => {
           this.rows = response.data.rows || [];
           this.total = response.data.total || 0;
+          this.loading = false;
         })
       },
       getAllCompanies() {
@@ -181,8 +186,6 @@
       },
       handleSelectChange() {
         this.page = 1;
-        this.companyId = this.productTreeVal[0];
-        this.productId = this.productTreeVal[1];
         this.getRows();
       },
       openFormAdd() {

@@ -2,31 +2,37 @@
   <div>
     <h3>验收记录</h3>
 
-    <!--<el-row>-->
-      <!--<el-col :span="12">-->
-        <!--<el-button type="primary" @click="openFormAdd()">添加</el-button>-->
+    <el-row>
+      <el-col :span="24">
+        <el-button type="primary" @click="$router.push('confirmForm')">采购验收</el-button>
 
-        <!--<el-select v-model="companyId" @change="handleSelectChange" filterable clearable placeholder="请选择生产商">-->
-          <!--<el-option v-for="item in companies"-->
-                     <!--v-if="item.type === 'manufacturer'"-->
-                     <!--:key="item.id"-->
-                     <!--:value="item.id"-->
-                     <!--:label="item.id + '. ' + item.name">-->
-          <!--</el-option>-->
-        <!--</el-select>-->
-      <!--</el-col>-->
-      <!--<el-col :span="12"></el-col>-->
-    <!--</el-row>-->
-    <!--<br>-->
+        <el-select v-model="companyId" @change="handleSelectChange" filterable clearable placeholder="请选择供货单位">
+          <el-option v-for="item in companies"
+                     :key="item.id"
+                     :value="item.id"
+                     :label="item.id + '. ' + item.name">
+          </el-option>
+        </el-select>
+        <el-cascader v-model="productTreeVal" :options="productTree" placeholder="请选择货品"
+                     expand-trigger="click"
+                     clearable
+                     filterable
+                     @change="handleSelectChange"
+                     style="width: 250px"
+        ></el-cascader>
+        <el-button type="primary" @click="handleSelectChange">搜索</el-button>
+      </el-col>
+    </el-row>
+    <br>
 
-    <el-table :data="rows" border>
+    <el-table :data="rows" border v-loading="loading">
       <el-table-column prop="id" label="验收日期">
         <template slot-scope="scope">{{ scope.row.created_at.substring(0, 10) }}</template>
       </el-table-column>
+      <el-table-column prop="manufacturer" label="生产厂家"></el-table-column>
       <el-table-column prop="" label="品名及规格">
         <template slot-scope="scope">{{ scope.row.product_name + ' - ' + scope.row.product_model }}</template>
       </el-table-column>
-      <el-table-column prop="manufacturer" label="生产厂家"></el-table-column>
       <el-table-column prop="batch" label="生产批号"></el-table-column>
       <el-table-column prop="batch2" label="灭菌批号"></el-table-column>
       <el-table-column prop="expire" label="有效期"></el-table-column>
@@ -136,6 +142,8 @@
         loading: false,
         companyId: '',
         companies: [],
+        productTree: [],
+        productTreeVal: [],
         rows: [],
         total: 0,
         pageSize: 10,
@@ -149,7 +157,8 @@
           getRows: this.url('/api/purchase/getConfirmLog'),
           add: this.url('/product/create'),
           edit: this.url('/api/purchase/editConfirmLog'),
-          getAllCompanies: this.url('/api/getAllCompanies')
+          getAllCompanies: this.url('/api/getAllCompanies'),
+          getProductTree: this.url('/api/getProductTree'),
         }
       };
     },
@@ -205,7 +214,8 @@
             order: 'desc',
             offset: this.pageSize * (this.page - 1),
             limit: this.pageSize,
-            company_id: this.companyId
+            companyId: this.companyId,
+            productId: this.productTreeVal[1],
           }
         }).then(response => {
           this.rows = response.data.rows || [];
@@ -217,6 +227,24 @@
       getAllCompanies() {
         this.$http.get(this.urls.getAllCompanies).then(response => {
           this.companies = response.data.rows;
+        });
+      },
+      getProductTree() {
+        this.$http.get(this.urls.getProductTree).then(response => {
+          let rows = response.data.rows;
+
+          this.productTree = rows.map(company => {
+            return {
+              value: company.id,
+              label: company.id + '. ' + company.name,
+              children: company.products.map(product => {
+                return {
+                  value: product.id,
+                  label: product.name + ' - ' + product.model
+                }
+              })
+            };
+          });
         });
       },
       handleSizeChange(val) {
@@ -261,6 +289,7 @@
     },
     created() {
       this.getAllCompanies();
+      this.getProductTree();
       this.getRows();
     }
   }
