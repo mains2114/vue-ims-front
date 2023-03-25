@@ -40,7 +40,7 @@
       <el-table-column prop="manufacturer" label="生产厂商"></el-table-column>
       <el-table-column prop="product_name" label="货品"></el-table-column>
       <el-table-column prop="product_model" label="型号"></el-table-column>
-      <el-table-column prop="batch" label="生产批次"></el-table-column>
+      <el-table-column prop="batch" label="生产批号"></el-table-column>
       <el-table-column prop="receipt_type" label="操作类型">
         <template slot-scope="scope">
           {{ scope.row.receipt_type === 'in' ? '入库' : '出库' }}

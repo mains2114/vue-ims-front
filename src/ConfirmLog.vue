@@ -127,7 +127,7 @@
 
     <el-dialog title="库存详情" :visible.sync="dialog2Visible">
       <el-table :data="dialog2Rows" border>
-        <el-table-column prop="batch" label="生产批次"></el-table-column>
+        <el-table-column prop="batch" label="生产批号"></el-table-column>
         <el-table-column prop="num" label="库存"></el-table-column>
       </el-table>
     </el-dialog>

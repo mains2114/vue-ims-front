@@ -49,7 +49,7 @@
             <el-table-column prop="product.name" label="货品"></el-table-column>
             <el-table-column prop="product.model" label="型号"></el-table-column>
             <el-table-column prop="num" label="数量"></el-table-column>
-            <el-table-column prop="batch" label="生产批次"></el-table-column>
+            <el-table-column prop="batch" label="生产批号"></el-table-column>
             <el-table-column prop="expire" label="过期时间"></el-table-column>
             <!--<el-table-column prop="updated_at" label="更新时间"></el-table-column>-->
             <el-table-column label="操作">
