@@ -27,6 +27,14 @@
           <el-option value="in" label="入库"></el-option>
           <el-option value="out" label="出库"></el-option>
         </el-select>
+
+        <el-select v-model="optionalColumns" multiple placeholder="额外的显示列" collapse-tags>
+          <el-option value="expire" label="有效期"></el-option>
+          <el-option value="product_unit" label="单位"></el-option>
+          <el-option value="price" label="单价"></el-option>
+          <el-option value="price_total" label="总价"></el-option>
+          <el-option value="receipt_time" label="操作时间"></el-option>
+        </el-select>
         
         <el-button type="primary" @click="handleSelectChange">搜索</el-button>
       </el-col>
@@ -40,15 +48,26 @@
       <el-table-column prop="manufacturer" label="生产厂商"></el-table-column>
       <el-table-column prop="product_name" label="货品"></el-table-column>
       <el-table-column prop="product_model" label="型号"></el-table-column>
-      <el-table-column prop="batch" label="生产批次"></el-table-column>
+      <el-table-column prop="batch" label="生产批号"></el-table-column>
+      <el-table-column prop="expire" label="有效期" v-if="optionalColumns.indexOf('expire') !== -1"></el-table-column>
       <el-table-column prop="receipt_type" label="操作类型">
         <template slot-scope="scope">
           {{ scope.row.receipt_type === 'in' ? '入库' : '出库' }}
         </template>
       </el-table-column>
       <el-table-column prop="num" label="数量"></el-table-column>
-      <el-table-column prop="product_unit" label="单位"></el-table-column>
-      <el-table-column prop="receipt_time" label="操作时间"></el-table-column>
+      <el-table-column prop="product_unit" label="单位" v-if="optionalColumns.indexOf('product_unit') !== -1"></el-table-column>
+      <el-table-column prop="price" label="单价" v-if="optionalColumns.indexOf('price') !== -1">
+        <template slot-scope="scope">
+          {{ parseFloat(scope.row.price) }}
+        </template>
+      </el-table-column>
+      <el-table-column prop="price_total" label="总价" v-if="optionalColumns.indexOf('price_total') !== -1">
+        <template slot-scope="scope">
+          {{ Math.abs(scope.row.num) * scope.row.price }}
+        </template>
+      </el-table-column>
+      <el-table-column prop="receipt_time" label="操作时间" v-if="optionalColumns.indexOf('receipt_time') !== -1"></el-table-column>
       <el-table-column prop="receipt_id" label="单据"></el-table-column>
       <el-table-column prop="company_name" label="交易公司"></el-table-column>
     </el-table>
@@ -115,6 +134,7 @@
       return {
         loading: false,
         companyId: '',
+        optionalColumns: [],
         companies: [],
         productId: '',
         productTree: [],

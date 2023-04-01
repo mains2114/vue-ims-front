@@ -81,7 +81,7 @@
     </el-row>
 
     <el-dialog title="选择货物（仅能选择有库存的货物）" :visible.sync="dialogFormVisible" width="70%">
-      <el-form :model="form">
+      <el-form inline>
         <el-form-item label="生产商" :label-width="formLabelWidth">
           <el-select v-model="productsFilter" placeholder="请选择生产商" filterable>
             <el-option v-for="company in companies"
