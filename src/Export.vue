@@ -1,3 +1,12 @@
+<style>
+  .el-input > .el-input__inner {
+    padding: 0 10px;
+  }
+  .el-input > .el-input-group__append {
+    padding: 0 10px;
+  }
+</style>
+
 <template>
   <el-form inline>
     <el-row style="font-size: 24px;">
@@ -32,7 +41,7 @@
       <!--<el-table-column prop="id" label="编号" width="60"></el-table-column>-->
       <el-table-column prop="name" label="名称"></el-table-column>
       <el-table-column prop="model" label="规格"></el-table-column>
-      <el-table-column prop="company_name" label="生产厂家"></el-table-column>
+      <el-table-column prop="company_name" label="生产厂家" width="80"></el-table-column>
       <el-table-column prop="unit" label="单位" width="60"></el-table-column>
       <el-table-column prop="price" label="单价">
         <template slot-scope="scope">
@@ -41,7 +50,9 @@
       </el-table-column>
       <el-table-column prop="num" label="数量">
         <template slot-scope="scope">
-          <el-input-number v-model="scope.row.num2" :min="0" :max="scope.row.num || scope.row.num + 1" size="small"></el-input-number>
+          <el-input v-model="scope.row.num2" :min="0" size="small">
+            <template slot="append">/ {{ scope.row.num }}</template>
+          </el-input>
         </template>
       </el-table-column>
       <el-table-column prop="batch" label="生产批号"></el-table-column>
