@@ -32,7 +32,7 @@
     <el-table :data="rows" border v-loading="loading">
       <!--<el-table-column type="selection"></el-table-column>-->
       <el-table-column prop="formatted_no" label="单据编号" width="150px"></el-table-column>
-      <el-table-column prop="company_name" label="供货商/收货单位"></el-table-column>
+      <el-table-column prop="company_name" label="交易公司"></el-table-column>
       <el-table-column prop="date" label="制单时间"></el-table-column>
       <el-table-column prop="type" label="单据类型">
         <template slot-scope="scope">
@@ -129,6 +129,7 @@
         <el-button type="success" @click="formVisible = false" v-if="computedIsEdit">取消</el-button>
         <el-button type="danger" @click="submitForm()" v-if="computedIsEdit">保存</el-button>
         <el-button type="primary" @click="exportReceipt(form.id)" v-else>导出单据</el-button>
+        <el-button type="primary" @click="showDelivery(form.id)" v-if="computedShowDelivery">查看发货单</el-button>
       </span>
     </el-dialog>
   </div>
@@ -165,6 +166,9 @@
       computedIsEdit() {
         return this.formMode === 'edit';
       },
+      computedShowDelivery() {
+        return this.formMode === 'view' && this.form.type === 'in';
+      }
     },
     methods: {
       methodIsEnableEdit(row) {
@@ -174,6 +178,9 @@
       },
       exportReceipt(receiptId) {
         window.open(this.url('/receipt/export/' + receiptId))
+      },
+      showDelivery(receiptId) {
+        window.open(this.url('/api/receipt/generateDelivery?receiptId=' + receiptId))
       },
       getRows() {
         this.loading = true;

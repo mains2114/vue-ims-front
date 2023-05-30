@@ -5,6 +5,7 @@
     <el-row>
       <el-col :span="24">
         <el-button type="primary" @click="$router.push('confirmForm')">采购验收</el-button>
+        <el-button type="primary" @click="$router.push('confirmImport')">验收入库</el-button>
 
         <el-select v-model="companyId" @change="handleSelectChange" filterable clearable placeholder="请选择供货单位">
           <el-option v-for="item in companies"
