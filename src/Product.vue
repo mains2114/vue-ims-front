@@ -47,6 +47,8 @@
       <el-table-column label="操作">
         <template slot-scope="scope">
           <el-button size="small" @click="openFormEdit(scope.row)" type="text">编辑</el-button>
+          <el-button size="small" @click="openFormAdd(scope.row)" type="text">复制</el-button>
+          &nbsp;
           <el-popconfirm title="确认删除？"
             @confirm="deleteRows('product', [scope.row.id])"
           >
@@ -205,9 +207,13 @@
         this.page = 1;
         this.getRows();
       },
-      openFormAdd() {
+      openFormAdd(item) {
         this.formMode = 'add';
-        this.form = {};
+        if (item) {
+          this.form = Object.assign({}, item);
+        } else {
+          this.form = {};
+        }
         this.formVisible = true;
       },
       openFormEdit(item) {
