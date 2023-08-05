@@ -23,7 +23,8 @@
             <i class="el-icon-arrow-down el-icon--right"></i>
           </span>
           <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item>用户信息</el-dropdown-item>
+            <el-dropdown-item command="profile">用户信息</el-dropdown-item>
+            <el-dropdown-item command="manage">账户管理</el-dropdown-item>
             <el-dropdown-item command="oldVersion">切换旧版本</el-dropdown-item>
             <el-dropdown-item divided command="logout">退出登录</el-dropdown-item>
           </el-dropdown-menu>
@@ -34,7 +35,7 @@
       <router-view></router-view>
     </el-main>
     <el-footer>
-      <p style="text-align: center;">ims-laravel © 2017 - 2022</p>
+      <p style="text-align: center;">ims-laravel © 2017 - 2023</p>
     </el-footer>
   </el-container>
 </template>
@@ -48,11 +49,23 @@
       };
     },
     methods: {
+      getProfile() {
+        this.$http.get(this.url('/api/account/getProfile')).then((response) => {
+          let resp = response.data;
+          this.username = resp.data.user.name;
+          window.ims.user = resp.data.user;
+          window.ims.account = resp.data.account;
+        });
+      },
       handleCommand(command) {
         if (command === 'logout') {
           this.logout();
         } else if (command === 'oldVersion') {
           window.location.href = '/home';
+        } else if (command === 'profile') {
+          this.$router.push('/profile');
+        } else if (command === 'manage') {
+          this.$router.push('/manage');
         }
       },
       logout() {
@@ -60,6 +73,9 @@
           window.location.href = '/';
         });
       }
+    },
+    created() {
+      this.getProfile();
     }
   }
 </script>
