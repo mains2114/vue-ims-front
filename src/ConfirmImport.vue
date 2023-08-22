@@ -2,7 +2,7 @@
   <el-form inline>
     <el-row style="font-size: 24px;">
       <el-col :span="12" :offset="6" align="center">验收入库</el-col>
-      <el-col :span="6" align="right">No.00001234</el-col>
+      <!-- <el-col :span="6" align="right">No.00001234</el-col> -->
     </el-row>
 
     <el-row>
@@ -34,31 +34,31 @@
       <el-table-column prop="product_model" label="规格"></el-table-column>
       <el-table-column prop="manufacturer" label="生产厂家"></el-table-column>
       <el-table-column prop="product_unit" label="单位" width="60"></el-table-column>
-      <el-table-column prop="price" label="单价">
-        <template slot-scope="scope">
-          <el-input v-model="scope.row.price" size="small"></el-input>
-        </template>
-      </el-table-column>
       <el-table-column prop="num" label="数量">
         <template slot-scope="scope">
           <el-input-number v-model="scope.row.num" :min="0" size="small"></el-input-number>
         </template>
       </el-table-column>
-      <el-table-column prop="batch" label="生产批号">
+      <el-table-column prop="price" label="单价">
         <template slot-scope="scope">
-          <el-input v-model="scope.row.batch" size="small"></el-input>
-        </template>
-      </el-table-column>
-      <el-table-column prop="expire" label="有效期" width="165">
-        <template slot-scope="scope">
-          <el-date-picker type="date" v-model="scope.row.expire" size="small" placeholder="选择日期"
-                          value-format="yyyy-MM-dd">
-          </el-date-picker>
+          <el-input v-model="scope.row.price" size="small"></el-input>
         </template>
       </el-table-column>
       <el-table-column prop="total" label="总价" width="100">
         <template slot-scope="scope">
           {{ scope.row.price * (scope.row.num2 || 0) | toFixed(2) }}
+        </template>
+      </el-table-column>
+      <el-table-column prop="batch" label="生产批号" min-width="120">
+        <template slot-scope="scope">
+          <el-input v-model="scope.row.batch" size="small"></el-input>
+        </template>
+      </el-table-column>
+      <el-table-column prop="expire" label="有效期" min-width="100">
+        <template slot-scope="scope">
+          <el-date-picker type="date" v-model="scope.row.expire" size="small" placeholder="选择日期"
+                          value-format="yyyy-MM-dd">
+          </el-date-picker>
         </template>
       </el-table-column>
       <el-table-column label="操作" width="80" fixed="right">
@@ -71,17 +71,17 @@
     <br>
 
     <el-row style="text-align: left;">
-      <el-col :span="6">收货人：黄忠发</el-col>
-      <el-col :span="6">送货人：</el-col>
-      <el-col :span="6">制单：熊水香</el-col>
-      <el-col :span="6">单位盖章：（未盖章无效）</el-col>
+      <el-col :span="6"><el-form-item label="收货人："><el-input v-model="form.receiver"></el-input></el-form-item></el-col>
+      <el-col :span="6"><el-form-item label="送货人："><el-input v-model="form.delivery"></el-input></el-form-item></el-col>
+      <el-col :span="6"><el-form-item label="制单："><el-input v-model="form.creator"></el-input></el-form-item></el-col>
+      <el-col :span="6"><el-form-item label="审核："><el-input v-model="form.reviewer"></el-input></el-form-item></el-col>
     </el-row>
 
-    <el-row style="text-align: left;">
+    <!-- <el-row style="text-align: left;">
       <el-col :span="6">地址：钟山县西路原收费站北侧</el-col>
       <el-col :span="12">电话：8972468&nbsp;&nbsp;13132943929&nbsp;&nbsp;13878456812</el-col>
       <el-col :span="6">传真：8972468</el-col>
-    </el-row>
+    </el-row> -->
 
     <el-row>
       <el-col :span="12" :offset="6" style="text-align: center;">

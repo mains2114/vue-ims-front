@@ -28,6 +28,34 @@ Vue.prototype.$http = axios;
 
 // Vue.prototype.url = api => 'http://ims.local:8080' + api;
 Vue.prototype.url = api => api;
+Vue.prototype.apiList = () => {
+  return {
+    delRecords: '/api/delRecords',
+    getAllCompanies: '/api/getAllCompanies',
+    getCompanies: '/api/getCompanies',
+    getExpireWarning: '/api/getExpireWarning',
+    getInventories: '/api/getInventories',
+    getInventoryWarning: '/api/getInventoryWarning',
+    getProducts: '/api/getProducts',
+    getProductTree: '/api/getProductTree',
+    getReceipts: '/api/getReceipts',
+    getStorage: '/api/getStorage',
+    saveReceiptChangeV2: '/api/inventory/saveReceiptChangeV2',
+    lockStorage: '/api/lockStorage',
+    addConfirmLog: '/api/purchase/addConfirmLog',
+    editConfirmLog: '/api/purchase/editConfirmLog',
+    getConfirmLog: '/api/purchase/getConfirmLog',
+    companyEdit: '/company/',
+    companyCreate: '/company/create',
+    export: '/inventory/export',
+    import: '/inventory/import',
+    logout: '/logout',
+    productEdit: '/product/',
+    productCreate: '/product/create',
+    receiptCreate: '/receipt/create',
+    receiptExport: '/receipt/export',
+  }
+};
 Vue.use(ElementUI);
 Vue.use(Router);
 
@@ -44,6 +72,8 @@ const routes = [
   { path: '/purchaseManage/ConfirmLog', component: () => import('./ConfirmLog.vue') },
   { path: '/purchaseManage/ConfirmImport', component: () => import('./ConfirmImport.vue') },
   { path: '/changes', component: () => import('./Changes.vue') },
+  { path: '/profile', component: () => import('./Profile.vue') },
+  { path: '/manage', component: () => import('./Manage.vue') },
 ];
 
 const router = new Router({
