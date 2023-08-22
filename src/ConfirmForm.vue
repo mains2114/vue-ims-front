@@ -7,9 +7,6 @@
     <br>
 
     <el-table border="" :data="tableRows">
-      <el-table-column prop="id" label="验收日期" width="100">
-        <template slot-scope="scope">-</template>
-      </el-table-column>
       <el-table-column prop="name" label="品名及规格" width="200">
         <template slot-scope="scope">{{ scope.row.name + ' - ' + scope.row.model }}</template>
       </el-table-column>

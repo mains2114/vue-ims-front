@@ -18,6 +18,9 @@
       <el-table-column prop="updated_at" label="修改时间"></el-table-column>
       <el-table-column label="操作">
         <template slot-scope="scope">
+          <el-popconfirm title="确认切换？" @confirm="switchAccount(scope.row)">
+            <el-button slot="reference" size="small" type="text">切换</el-button>
+          </el-popconfirm>
           <el-button size="small" @click="openFormEdit(scope.row)" type="text">编辑</el-button>
           <el-popconfirm title="确认删除？"
             @confirm="deleteRows('account', [scope.row.id])"
@@ -137,6 +140,13 @@
         this.formMode = 'edit';
         this.form = Object.assign({}, item);
         this.formVisible = true;
+      },
+      switchAccount(item) {
+        window.ims.account = item;
+        this.$message({
+          message: '已切换为：' + item.name,
+          type: 'success'
+        });
       },
       submitForm() {
         let url = this.formMode === 'add'
