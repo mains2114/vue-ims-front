@@ -117,7 +117,7 @@
         </el-table-column>
         <el-table-column align="center" prop="expire" label="有效期" min-width="100px">
           <template slot-scope="scope">
-            <el-date-picker type="date" v-model="scope.row.expire" v-if="computedIsEdit"></el-date-picker>
+            <el-date-picker type="date" v-model="scope.row.expire" v-if="computedIsEdit" value-format="yyyy-MM-dd"></el-date-picker>
             <span v-else>{{ scope.row.expire }}</span>
           </template>
         </el-table-column>

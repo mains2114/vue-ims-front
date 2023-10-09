@@ -88,7 +88,7 @@
           <el-input v-model="form.id" disabled></el-input>
         </el-form-item>
         <el-form-item label="制单时间">
-          <el-date-picker type="date" v-model="form.date"></el-date-picker>
+          <el-date-picker type="date" v-model="form.date" value-format="yyyy-MM-dd"></el-date-picker>
         </el-form-item>
         <el-form-item label="购货单位">
           <el-select v-model="form.company_id" filterable>
