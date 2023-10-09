@@ -23,7 +23,7 @@
       </el-col>
       <el-col :span="12" align="right">
         <el-form-item label="制单时间">
-          <el-date-picker type="date" v-model="form.date"></el-date-picker>
+          <el-date-picker type="date" v-model="form.date" value-format="yyyy-MM-dd"></el-date-picker>
         </el-form-item>
       </el-col>
     </el-row>
