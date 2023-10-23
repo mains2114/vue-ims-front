@@ -91,17 +91,16 @@
       </el-col>
     </el-row>
 
-    <el-dialog title="选择货物（仅能选择有库存的货物）" :visible.sync="dialogFormVisible" width="70%">
+    <el-dialog title="选择货物（仅显示有库存的货物）" :visible.sync="dialogFormVisible" width="70%">
       <el-form inline>
-        <el-form-item label="生产商" :label-width="formLabelWidth">
-          <el-select v-model="productsFilter" placeholder="请选择生产商" filterable>
-            <el-option v-for="company in companies"
-                       v-if="company.type === 'manufacturer'"
-                       :key="company.id"
-                       :value="company.id"
-                       :label="company.id + '. ' + company.name">
-            </el-option>
-          </el-select>
+        <el-form-item label="选择货品" :label-width="formLabelWidth">
+          <el-cascader v-model="productTreeVal" :options="productTree" placeholder="请选择货品"
+                      clearable
+                      filterable
+                      @change="productTreeChange"
+                      style="width: 250px"
+                      :props="{ expandTrigger: 'click', checkStrictly: true }"
+          ></el-cascader>
         </el-form-item>
       </el-form>
 
@@ -113,7 +112,7 @@
         <el-table-column prop="batch" label="批次" :width="90"></el-table-column>
         <el-table-column prop="expire" label="有效期" :width="100"></el-table-column>
         <!--<el-table-column prop="unit" label="单位"></el-table-column>-->
-        <el-table-column prop="prefer_price" label="单价"></el-table-column>
+        <!-- <el-table-column prop="prefer_price" label="单价"></el-table-column> -->
         <el-table-column prop="num" label="数量"></el-table-column>
       </el-table>
 
@@ -141,6 +140,8 @@
         companyType: null,
         companies: [],
         productsFilter: null,
+        productTree: [],
+        productTreeVal: [],
         products: [],
         productsSelected: [],
         components: {},
@@ -151,21 +152,23 @@
           getAllCompanies: this.url('/api/getAllCompanies'),
           getStorage: this.url('/api/getStorage'),
           submitForm: this.url('/inventory/export'),
+          getProductTree: this.url('/api/getProductTree'),
         }
       }
     },
     computed: {
       productsFiltered() {
         return this.products.filter((value) => {
-          if (!this.productsFilter) {
+          if (this.productTreeVal.length === 0) {
             return true;
           }
-
-          if (value.company_id === this.productsFilter) {
-            return true;
-          } else {
-            return false;
+          if (this.productTreeVal.length === 1) {
+            return value.company_id === this.productTreeVal[0];
           }
+          if (this.productTreeVal.length >= 2) {
+            return value.product_id === this.productTreeVal[1];
+          }
+          return true;
         })
       },
       companiesGrouped() {
@@ -202,6 +205,24 @@
           this.companies = response.data.rows;
         })
       },
+      getProductTree() {
+        this.$http.get(this.urls.getProductTree).then(response => {
+          let rows = response.data.rows;
+
+          this.productTree = rows.map(company => {
+            return {
+              value: company.id,
+              label: company.id + '. ' + company.name,
+              children: company.products.map(product => {
+                return {
+                  value: product.id,
+                  label: product.name + ' - ' + product.model
+                }
+              })
+            };
+          });
+        });
+      },
       getProducts() {
         this.$http.get(this.urls.getStorage, {
           params: {
@@ -216,10 +237,12 @@
         this.productsSelected = rows;
       },
       chooseProducts() {
+        console.log(this.productsSelected);
         var selectedRows = this.productsSelected.map(item => {
           let newItem = _.clone(item);
-          newItem.price = parseFloat(item.prefer_price);
-          newItem.num = parseFloat(item.num);
+          newItem.price = 0;
+          // newItem.price = parseFloat(item.prefer_price);
+          // newItem.num = parseFloat(item.num);
           return newItem;
         });
         this.tableRows = _.unionBy(this.tableRows, selectedRows, 'id');
@@ -257,10 +280,14 @@
           console.log(response);
           this.$message.error(response.data.msg || '请求错误');
         });
-      }
+      },
+      productTreeChange() {
+        console.log(this.productTreeVal);
+      },
     },
     created() {
       this.getManufacturers();
+      this.getProductTree();
       this.getProducts();
     }
   }
