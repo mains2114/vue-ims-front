@@ -109,7 +109,7 @@
         <el-table-column prop="company_name" label="生产厂家"></el-table-column>
         <el-table-column prop="name" label="名称" width="200" sortable></el-table-column>
         <el-table-column prop="model" label="规格"></el-table-column>
-        <el-table-column prop="batch" label="批次" :width="90"></el-table-column>
+        <el-table-column prop="batch" label="批次" :width="110"></el-table-column>
         <el-table-column prop="expire" label="有效期" :width="100"></el-table-column>
         <!--<el-table-column prop="unit" label="单位"></el-table-column>-->
         <!-- <el-table-column prop="prefer_price" label="单价"></el-table-column> -->

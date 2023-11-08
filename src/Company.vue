@@ -64,20 +64,20 @@
 
         <el-form-item label="公司简称">
           <el-input v-model="form.name"></el-input>
-          请输入2-50个字符，前置和拖尾的空白会被清除。
+          限定2-50个字符，不可重复。
         </el-form-item>
         <el-form-item label="公司全称">
           <el-input v-model="form.full_name"></el-input>
-          公司全称请输入公司完整的注册名称，该名称将用于出货单中填充相关单位名称。请输入2-100个字符。
+          请输入公司完整的注册名称，限定2-100个字符。
         </el-form-item>
         <el-form-item label="公司类型">
-          <el-radio v-model="form.type" label="manufacturer">生产商。 货品的生产商，创建货品、货品入库时需要使用此类公司。</el-radio>
+          <el-radio v-model="form.type" label="manufacturer">生产商。 货品的生产商，创建货品、货品入库时使用此类公司。</el-radio>
           <br>
-          <el-radio v-model="form.type" label="customer">顾客。 货品销售的对象，在货品销售出库时，需要选择此类公司。</el-radio>
+          <el-radio v-model="form.type" label="customer">顾客。 货品销售的对象，在货品销售出库时，选择此类公司。</el-radio>
           <br>
-          <el-radio v-model="form.type" label="seller">销售商。 货品的销售商，进货的对象。</el-radio>
+          <el-radio v-model="form.type" label="seller">销售商。 货品的销售商，进货时可选的公司。</el-radio>
           <br>
-          一个公司可以有多个类型，请至少选择一项。
+          <!-- 一个公司可以有多个类型，请至少选择一项。 -->
         </el-form-item>
 
         <el-form-item label="公司地址">
