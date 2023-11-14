@@ -11,6 +11,13 @@ window.ims = {
   enableReceiptEdit: false,
 };
 
+Vue.filter('toFixed', function(num, precision = 2) {
+  return num.toFixed(precision);
+});
+Vue.filter('trimZeroDate', function(date) {
+  return date === '0000-00-00' ? '' : date;
+});
+
 axios.interceptors.response.use(function (response) {
   // Do something with response data
   return response;

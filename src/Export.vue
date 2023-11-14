@@ -134,7 +134,7 @@
         dialogFormVisible: false,
         form: {
           companyId: null,
-          date: '',
+          date: new Date(),
         },
         formLabelWidth: '120px',
         companyType: null,
@@ -195,9 +195,6 @@
       }
     },
     filters: {
-      toFixed(num, precision = 2) {
-        return num.toFixed(precision);
-      }
     },
     methods: {
       getManufacturers() {

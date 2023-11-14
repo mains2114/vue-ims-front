@@ -46,7 +46,7 @@
       </el-table-column>
       <el-table-column prop="total" label="总价" width="100">
         <template slot-scope="scope">
-          {{ scope.row.price * (scope.row.num2 || 0) | toFixed(2) }}
+          {{ scope.row.price * (scope.row.num || 0) | toFixed(2) }}
         </template>
       </el-table-column>
       <el-table-column prop="batch" label="生产批号" min-width="120">
@@ -135,7 +135,7 @@
         dialogFormVisible: false,
         form: {
           companyId: null,
-          date: '',
+          date: new Date(),
         },
         formLabelWidth: '120px',
         companyType: null,
@@ -192,9 +192,6 @@
       }
     },
     filters: {
-      toFixed(num, precision = 2) {
-        return num.toFixed(precision);
-      }
     },
     methods: {
       getManufacturers() {

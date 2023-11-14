@@ -93,4 +93,7 @@
     height: 60px;
     padding: 0 20px;
   }
+  .el-date-editor.el-input {
+    width: 100%;
+  }
 </style>

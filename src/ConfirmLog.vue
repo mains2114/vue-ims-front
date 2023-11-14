@@ -35,7 +35,9 @@
         <template slot-scope="scope">{{ scope.row.product_name + ' - ' + scope.row.product_model }}</template>
       </el-table-column>
       <el-table-column prop="batch" label="生产批号"></el-table-column>
-      <el-table-column prop="batch2" label="灭菌批号"></el-table-column>
+      <el-table-column prop="produce_date" label="生产日期">
+        <template slot-scope="scope">{{ scope.row.produce_date | trimZeroDate }}</template>
+      </el-table-column>
       <el-table-column prop="expire" label="有效期"></el-table-column>
       <el-table-column prop="price" label="价格" width="80"></el-table-column>
       <el-table-column prop="num" label="数量" width="80"></el-table-column>
@@ -87,8 +89,10 @@
         <el-form-item label="生产批号">
           <el-input v-model="form.batch"></el-input>
         </el-form-item>
-        <el-form-item label="灭菌批号">
-          <el-input v-model="form.batch2"></el-input>
+        <el-form-item label="生产日期">
+          <el-date-picker type="date" v-model="form.produce_date" placeholder="选择日期"
+                          value-format="yyyy-MM-dd">
+          </el-date-picker>
         </el-form-item>
         <el-form-item label="有效期">
           <el-date-picker type="date" v-model="form.expire" placeholder="选择日期"
@@ -201,9 +205,6 @@
       }
     },
     filters: {
-      toFixed(num, precision = 2) {
-        return num.toFixed(precision);
-      }
     },
     methods: {
       getRows() {
