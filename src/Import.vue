@@ -188,9 +188,6 @@
       }
     },
     filters: {
-      toFixed(num, precision = 2) {
-        return num.toFixed(precision);
-      }
     },
     methods: {
       getManufacturers() {

@@ -26,9 +26,11 @@
           <el-input v-model="scope.row.batch" size="small"></el-input>
         </template>
       </el-table-column>
-      <el-table-column prop="batch2" label="灭菌批号">
+      <el-table-column prop="produce_date" label="生产日期" width="165">
         <template slot-scope="scope">
-          <el-input v-model="scope.row.batch2" size="small"></el-input>
+          <el-date-picker type="date" v-model="scope.row.produce_date" size="small" placeholder="选择日期"
+                          value-format="yyyy-MM-dd">
+          </el-date-picker>
         </template>
       </el-table-column>
       <el-table-column prop="expire" label="有效期" width="165">
@@ -255,9 +257,6 @@
       }
     },
     filters: {
-      toFixed(num, precision = 2) {
-        return num.toFixed(precision);
-      }
     },
     methods: {
       getManufacturers() {
@@ -304,10 +303,11 @@
           return {
             product_id: row.id,
             batch: row.batch,
+            produce_date: row.produce_date,
             expire: row.expire,
             num: row.num2,
             price: row.price,
-            batch2: row.batch2,
+            // batch2: row.batch2,
             company_id: row.company_id,
             company_audit: row.company_audit,
             package_status: row.package_status,
