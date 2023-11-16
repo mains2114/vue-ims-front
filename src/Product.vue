@@ -19,8 +19,13 @@
         <el-input v-model="searchModel" placeholder="请输入规格型号" clearable="" style="width: 180px;"></el-input>
 
         <el-button type="primary" @click="handleSelectChange">搜索</el-button>
+        <el-popover placement="bottom" trigger="click">
+          <el-checkbox-group v-model="optionalColumns">
+            <el-checkbox v-for="(cfg, index) in formExtCfg" :label="cfg.label"></el-checkbox>
+          </el-checkbox-group>
+          <el-button slot="reference" type="primary" icon="el-icon-menu"></el-button>
+        </el-popover>
       </el-col>
-      <el-col :span="12"></el-col>
     </el-row>
     <br>
 
@@ -33,6 +38,9 @@
       <el-table-column prop="unit" label="单位" width="80px"></el-table-column>
       <el-table-column prop="price" label="单价" width="100px"></el-table-column>
       <el-table-column prop="approval" label="注册号"></el-table-column>
+      <template v-for="(cfg, index) in formExtCfg">
+        <el-table-column :prop="'ext.' + cfg.field" :label="cfg.label" v-if="optionalColumns.indexOf(cfg.label) !== -1"></el-table-column>
+      </template>
       <el-table-column prop="" label="库存">
         <template slot-scope="scope">
           <el-popover trigger="click">
@@ -115,6 +123,10 @@
         <el-form-item label="中标号">
           <el-input v-model="form.bid"></el-input>
         </el-form-item>
+        <el-divider></el-divider>
+        <el-form-item v-for="(cfg, index) in formExtCfg" :label="cfg.label">
+          <el-input v-model="formExt[cfg.field]"></el-input>
+        </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="submitForm">保存</el-button>
           <el-button @click="formVisible = false">取消</el-button>
@@ -137,6 +149,7 @@
     data() {
       return {
         loading: false,
+        optionalColumns: [],
         companyId: '',
         companies: [],
         searchName: '',
@@ -148,6 +161,11 @@
         formVisible: false,
         formMode: 'add',
         form: {},
+        formExt: {},
+        formExtCfg: [
+          { field:'yb_code', label:'医保编码' },
+          { field:'price_online', label:'挂网价' },
+        ],
         dialog2Visible: false,
         dialog2Rows: [],
         urls: {
@@ -213,16 +231,14 @@
       },
       openFormAdd(item) {
         this.formMode = 'add';
-        if (item) {
-          this.form = Object.assign({}, item);
-        } else {
-          this.form = {};
-        }
+        this.form = {};
+        this.formExt = {};
         this.formVisible = true;
       },
       openFormEdit(item) {
         this.formMode = 'edit';
         this.form = Object.assign({}, item);
+        this.formExt = Object.assign({}, item.ext);
         this.formVisible = true;
       },
       openDialog2(rows) {
@@ -234,6 +250,7 @@
           ? this.urls.add
           : this.urls.edit + this.form.id;
 
+        this.form.ext = this.formExt;
         this.$http.post(url, this.form).then(response => {
           if (response.data.error === 0) {
             this.$message.success(response.data.msg || '操作成功');
