@@ -29,6 +29,7 @@
         </el-select>
 
         <el-select v-model="optionalColumns" multiple placeholder="额外的显示列" collapse-tags>
+          <el-option value="produce_date" label="生产日期"></el-option>
           <el-option value="expire" label="有效期"></el-option>
           <el-option value="product_unit" label="单位"></el-option>
           <el-option value="price" label="单价"></el-option>
@@ -49,6 +50,7 @@
       <el-table-column prop="product_name" label="货品"></el-table-column>
       <el-table-column prop="product_model" label="型号"></el-table-column>
       <el-table-column prop="batch" label="生产批号"></el-table-column>
+      <el-table-column prop="produce_date" label="生产日期" v-if="optionalColumns.indexOf('produce_date') !== -1"></el-table-column>
       <el-table-column prop="expire" label="有效期" v-if="optionalColumns.indexOf('expire') !== -1"></el-table-column>
       <el-table-column prop="receipt_type" label="操作类型">
         <template slot-scope="scope">

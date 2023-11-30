@@ -1,3 +1,15 @@
+<style>
+  .el-input > .el-input__inner {
+    padding: 0 10px;
+  }
+  .el-input > .el-input-group__append {
+    padding: 0 10px;
+  }
+  i.el-input__icon.el-icon-date {
+    display: none;
+  }
+</style>
+
 <template>
   <el-form inline>
     <el-row style="font-size: 24px;">
@@ -29,14 +41,14 @@
     </el-row>
 
     <el-table border="" :data="tableRows">
-      <el-table-column prop="id" label="编号" width="60"></el-table-column>
+      <!-- <el-table-column prop="id" label="编号" width="60"></el-table-column> -->
       <el-table-column prop="product_name" label="名称"></el-table-column>
       <el-table-column prop="product_model" label="规格"></el-table-column>
       <el-table-column prop="manufacturer" label="生产厂家"></el-table-column>
       <el-table-column prop="product_unit" label="单位" width="60"></el-table-column>
       <el-table-column prop="num" label="数量">
         <template slot-scope="scope">
-          <el-input-number v-model="scope.row.num" :min="0" size="small"></el-input-number>
+          <el-input v-model="scope.row.num" size="small"></el-input>
         </template>
       </el-table-column>
       <el-table-column prop="price" label="单价">
@@ -52,6 +64,13 @@
       <el-table-column prop="batch" label="生产批号" min-width="120">
         <template slot-scope="scope">
           <el-input v-model="scope.row.batch" size="small"></el-input>
+        </template>
+      </el-table-column>
+      <el-table-column prop="" label="生产日期" min-width="100">
+        <template slot-scope="scope">
+          <el-date-picker type="date" v-model="scope.row.produce_date" size="small" placeholder="选择日期"
+                          value-format="yyyy-MM-dd">
+          </el-date-picker>
         </template>
       </el-table-column>
       <el-table-column prop="expire" label="有效期" min-width="100">
@@ -235,6 +254,7 @@
             product_id: row.product_id,
             batch: row.batch,
             expire: row.expire,
+            produce_date: row.produce_date,
             num: row.num,
             price: row.price
           };
