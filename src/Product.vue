@@ -46,6 +46,7 @@
           <el-popover trigger="click">
             <el-table :data="scope.row.storage">
               <el-table-column prop="batch" label="生产批号" width="100px"></el-table-column>
+              <el-table-column prop="produce_date" label="生产日期" width="100px"></el-table-column>
               <el-table-column prop="expire" label="过期时间" width="100px"></el-table-column>
               <el-table-column prop="num" label="库存"></el-table-column>
             </el-table>
