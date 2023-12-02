@@ -67,21 +67,23 @@
         <el-form-item label="单据编号">
           <el-input v-model="form.formatted_no" disabled></el-input>
         </el-form-item>
-        <el-form-item label="制单时间">
-          <el-input v-model="form.date" disabled></el-input>
-        </el-form-item>
-        <el-form-item label="购货单位">
-          <el-input v-model="form.company_name" disabled></el-input>
-<!--          <el-select v-model="form.company_id" filterable disabled>-->
-<!--            <el-option v-for="item in companies"-->
-<!--                       :key="item.id"-->
-<!--                       :value="item.id"-->
-<!--                       :label="item.id + '. ' + item.name">-->
-<!--            </el-option>-->
-<!--          </el-select>-->
-        </el-form-item>
         <el-form-item label="单据类型">
           <el-input :value="form.type === 'in' ? '入库' : '出库'" disabled></el-input>
+        </el-form-item>
+        <el-form-item label="制单时间">
+          <el-date-picker type="date" v-model="form.date" value-format="yyyy-MM-dd" 
+            :disabled="!computedIsEdit"></el-date-picker>
+          <!-- <el-input v-model="form.date" :disabled="!computedIsEdit"></el-input> -->
+        </el-form-item>
+        <el-form-item label="购货单位">
+          <el-select v-model="form.company_id" filterable v-if="computedIsEdit">
+            <el-option v-for="item in companies"
+                        :key="item.id"
+                        :value="item.id"
+                        :label="item.id + '. ' + item.name">
+            </el-option>
+          </el-select>
+          <el-input v-model="form.company_name" disabled v-else></el-input>
         </el-form-item>
 
       <el-table :data="formRows">
@@ -113,6 +115,12 @@
           <template slot-scope="scope">
             <el-input type="text" v-model="scope.row.batch" v-if="computedIsEdit"></el-input>
             <span v-else>{{ scope.row.batch }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column align="center" prop="" label="生产日期" min-width="100px">
+          <template slot-scope="scope">
+            <el-date-picker type="date" v-model="scope.row.produce_date" v-if="computedIsEdit" value-format="yyyy-MM-dd"></el-date-picker>
+            <span v-else>{{ scope.row.produce_date }}</span>
           </template>
         </el-table-column>
         <el-table-column align="center" prop="expire" label="有效期" min-width="100px">
@@ -240,7 +248,7 @@
       },
       openFormView(item) {
         this.formMode = 'view';
-        this.form = item;
+        this.form = _.clone(item);
         this.formRows = _.map(item.inventories || [], (item) => {
           let tmp = _.clone(item);
           tmp.num = Math.abs(item.num);
@@ -250,7 +258,7 @@
       },
       openFormEdit(item) {
         this.formMode = 'edit';
-        this.form = item;
+        this.form = _.clone(item);
         this.formRows = _.map(item.inventories || [], (item) => {
           let tmp = _.clone(item);
           tmp.num = Math.abs(item.num);
@@ -264,6 +272,8 @@
           : this.urls.edit;
         let formData = {
           id: this.form.id,
+          date: this.form.date,
+          company_id: this.form.company_id,
           rows: _.map(this.formRows, (item) => {
             return {
               id: item.id,
@@ -271,6 +281,7 @@
               price: item.price,
               batch: item.batch,
               expire: item.expire,
+              produce_date: item.produce_date,
             };
           }),
         };

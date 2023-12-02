@@ -60,8 +60,25 @@
           {{ scope.row.price * (scope.row.num2 || 0) | toFixed(2) }}
         </template>
       </el-table-column>
-      <el-table-column prop="batch" label="生产批号" min-width="120"></el-table-column>
-      <el-table-column prop="expire" label="有效期" min-width="100"></el-table-column>
+      <el-table-column prop="batch" label="生产批号" min-width="100">
+        <template slot-scope="scope">
+          <el-input v-model="scope.row.batch" size="small"></el-input>
+        </template>
+      </el-table-column>
+      <el-table-column prop="" label="生产日期" min-width="100">
+        <template slot-scope="scope">
+          <el-date-picker type="date" v-model="scope.row.produce_date" size="small" placeholder="选择日期"
+                          value-format="yyyy-MM-dd">
+          </el-date-picker>
+        </template>
+      </el-table-column>
+      <el-table-column prop="expire" label="有效期" min-width="100">
+        <template slot-scope="scope">
+          <el-date-picker type="date" v-model="scope.row.expire" size="small" placeholder="选择日期"
+                          value-format="yyyy-MM-dd">
+          </el-date-picker>
+        </template>
+      </el-table-column>
       <el-table-column label="操作" width="80" fixed="right">
         <template slot-scope="scope">
           <el-button type="text" icon="el-icon-delete" size="small" @click="deleteTableRow(scope.row)">删除</el-button>
@@ -110,6 +127,7 @@
         <el-table-column prop="name" label="名称" width="200" sortable></el-table-column>
         <el-table-column prop="model" label="规格"></el-table-column>
         <el-table-column prop="batch" label="批次" :width="110"></el-table-column>
+        <el-table-column prop="produce_date" label="生产日期" :width="100"></el-table-column>
         <el-table-column prop="expire" label="有效期" :width="100"></el-table-column>
         <!--<el-table-column prop="unit" label="单位"></el-table-column>-->
         <!-- <el-table-column prop="prefer_price" label="单价"></el-table-column> -->
@@ -254,6 +272,7 @@
       submitReceipt() {
         var form = {
           company_id: this.form.companyId,
+          date: this.form.date,
           rows: []
         };
 
@@ -261,6 +280,7 @@
           return {
             product_id: row.id,
             batch: row.batch,
+            produce_date: row.produce_date,
             expire: row.expire,
             num: row.num2,
             price: row.price
