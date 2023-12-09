@@ -137,7 +137,6 @@
         <el-button type="success" @click="formVisible = false" v-if="computedIsEdit">取消</el-button>
         <el-button type="danger" @click="submitForm()" v-if="computedIsEdit">保存</el-button>
         <el-button type="primary" @click="exportReceipt(form.id)" v-else>导出单据</el-button>
-        <el-button type="primary" @click="showDelivery(form.id)" v-if="computedShowDelivery">查看发货单</el-button>
       </span>
     </el-dialog>
   </div>
@@ -174,9 +173,6 @@
       computedIsEdit() {
         return this.formMode === 'edit';
       },
-      computedShowDelivery() {
-        return this.formMode === 'view' && this.form.type === 'in';
-      }
     },
     methods: {
       methodIsEnableEdit(row) {
@@ -186,9 +182,6 @@
       },
       exportReceipt(receiptId) {
         window.open(this.url('/receipt/export/' + receiptId))
-      },
-      showDelivery(receiptId) {
-        window.open(this.url('/api/receipt/generateDelivery?receiptId=' + receiptId))
       },
       getRows() {
         this.loading = true;

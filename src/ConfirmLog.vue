@@ -15,7 +15,7 @@
           </el-option>
         </el-select>
         <el-cascader v-model="productTreeVal" :options="productTree" placeholder="请选择货品"
-                     expand-trigger="click"
+                     :props="{expandTrigger:'click'}"
                      clearable
                      filterable
                      @change="handleSelectChange"

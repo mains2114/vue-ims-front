@@ -15,12 +15,11 @@
           </el-option>
         </el-select>
 
-        <el-cascader v-model="productTreeVal" :options="productTree" placeholder="请选择货品"
-                     expand-trigger="click"
-                     clearable
-                     filterable
-                     @change="handleSelectChange"
-                     style="width: 250px"
+        <el-cascader placeholder="请选择货品" clearable filterable style="width: 250px"
+          v-model="productTreeVal"
+          :options="productTree"
+          :props="{expandTrigger:'click'}"
+          @change="handleSelectChange"
         ></el-cascader>
 
         <el-select v-model="receiptType" @change="handleSelectChange" clearable placeholder="选择单据类型">
@@ -29,6 +28,8 @@
         </el-select>
 
         <el-select v-model="optionalColumns" multiple placeholder="额外的显示列" collapse-tags>
+          <el-option value="多选框" lable="多选框"></el-option>
+          <el-option value="编号" lable="编号"></el-option>
           <el-option value="produce_date" label="生产日期"></el-option>
           <el-option value="expire" label="有效期"></el-option>
           <el-option value="product_unit" label="单位"></el-option>
@@ -38,14 +39,21 @@
         </el-select>
         
         <el-button type="primary" @click="handleSelectChange">搜索</el-button>
+
+        <el-dropdown split-button type="primary" trigger="click" @command="handleCommand">
+          操作
+          <el-dropdown-menu slot="dropdown">
+            <el-dropdown-item command="generateDelivery" :disabled="!rowIdStr">生成发货单</el-dropdown-item>
+          </el-dropdown-menu>
+        </el-dropdown>
       </el-col>
       <!--<el-col :span="12"></el-col>-->
     </el-row>
     <br>
 
-    <el-table :data="rows" border v-loading="loading">
-      <!--<el-table-column type="selection"></el-table-column>-->
-      <el-table-column prop="id" label="编号" width="70"></el-table-column>
+    <el-table :data="rows" border v-loading="loading" @selection-change="handleSelectionChange">
+      <el-table-column type="selection" v-if="optionalColumns.indexOf('多选框') !== -1"></el-table-column>
+      <el-table-column prop="id" label="编号" width="70" v-if="optionalColumns.indexOf('编号') !== -1"></el-table-column>
       <el-table-column prop="manufacturer" label="生产厂商"></el-table-column>
       <el-table-column prop="product_name" label="货品"></el-table-column>
       <el-table-column prop="product_model" label="型号"></el-table-column>
@@ -135,6 +143,7 @@
     data() {
       return {
         loading: false,
+        rowIdStr: '',
         companyId: '',
         optionalColumns: [],
         companies: [],
@@ -151,6 +160,7 @@
         form: {},
         formRows: [],
         urls: {
+          generateDelivery: this.url('/api/receipt/generateDelivery'),
           getRows: this.url('/api/getInventories'),
           add: this.url('/product/create'),
           edit: this.url('/product/'),
@@ -160,6 +170,21 @@
       };
     },
     methods: {
+      handleSelectionChange(val) {
+        let rowIdArr = [];
+        val.map((el, index) => {
+            rowIdArr.push(el.id);
+        })
+        this.rowIdStr = rowIdArr.join(',');
+      },
+      handleCommand(command) {
+        if (command === 'generateDelivery') {
+          this.generateDelivery();
+        }
+      },
+      generateDelivery() {
+        window.open(this.urls.generateDelivery + '?companyId=' + this.companyId + '&rowIdStr=' + this.rowIdStr);
+      },
       getRows() {
         this.loading = true;
         this.$http.get(this.urls.getRows, {

@@ -21,7 +21,7 @@
         <el-button type="primary" @click="handleSelectChange">搜索</el-button>
         <el-popover placement="bottom" trigger="click">
           <el-checkbox-group v-model="optionalColumns">
-            <el-checkbox v-for="(cfg, index) in formExtCfg" :label="cfg.label"></el-checkbox>
+            <el-checkbox v-for="(cfg, index) in formExtCfg" :label="cfg.label" :key="cfg.label"></el-checkbox>
           </el-checkbox-group>
           <el-button slot="reference" type="primary" icon="el-icon-menu"></el-button>
         </el-popover>
@@ -39,7 +39,7 @@
       <el-table-column prop="price" label="单价" width="100px"></el-table-column>
       <el-table-column prop="approval" label="注册号"></el-table-column>
       <template v-for="(cfg, index) in formExtCfg">
-        <el-table-column :prop="'ext.' + cfg.field" :label="cfg.label" v-if="optionalColumns.indexOf(cfg.label) !== -1"></el-table-column>
+        <el-table-column :prop="'ext.' + cfg.field" :label="cfg.label" :key="cfg.field" v-if="optionalColumns.indexOf(cfg.label) !== -1"></el-table-column>
       </template>
       <el-table-column prop="" label="库存">
         <template slot-scope="scope">
