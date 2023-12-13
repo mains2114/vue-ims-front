@@ -4,7 +4,7 @@
       <el-menu mode="horizontal" router :default-active="$route.path === '/' ? '/' : $route.path">
         <el-menu-item index="/">主页</el-menu-item>
         <el-menu-item index="/company">公司</el-menu-item>
-        <el-menu-item index="/product">货品与库存</el-menu-item>
+        <el-menu-item index="/product">货品</el-menu-item>
         <el-menu-item index="/receipt">单据</el-menu-item>
         <el-menu-item index="/inventory">流水</el-menu-item>
         <!-- <el-menu-item index="/import">入库</el-menu-item> -->
@@ -95,5 +95,14 @@
   }
   .el-date-editor.el-input {
     width: 100%;
+  }
+  .el-input > .el-input__inner {
+    padding: 0 10px;
+  }
+  .el-input > .el-input-group__append {
+    padding: 0 10px;
+  }
+  i.el-input__icon.el-icon-date {
+    display: none;
   }
 </style>
