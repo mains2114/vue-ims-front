@@ -1,15 +1,3 @@
-<style>
-  .el-input > .el-input__inner {
-    padding: 0 10px;
-  }
-  .el-input > .el-input-group__append {
-    padding: 0 10px;
-  }
-  i.el-input__icon.el-icon-date {
-    display: none;
-  }
-</style>
-
 <template>
   <el-form inline>
     <el-row style="font-size: 24px;">

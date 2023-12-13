@@ -1,12 +1,3 @@
-<style>
-  .el-input > .el-input__inner {
-    padding: 0 10px;
-  }
-  .el-input > .el-input-group__append {
-    padding: 0 10px;
-  }
-</style>
-
 <template>
   <el-form inline>
     <el-row style="font-size: 24px;">
@@ -46,7 +37,7 @@
       <el-table-column prop="num" label="数量">
         <template slot-scope="scope">
           <el-input v-model="scope.row.num2" :min="0" size="small">
-            <template slot="append">/ {{ scope.row.num }}</template>
+            <template slot="append">{{ scope.row.num }}</template>
           </el-input>
         </template>
       </el-table-column>
