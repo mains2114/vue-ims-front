@@ -21,6 +21,7 @@
         <el-button type="primary" @click="handleSelectChange">搜索</el-button>
         <el-popover placement="bottom" trigger="click">
           <el-checkbox-group v-model="optionalColumns">
+            <el-checkbox label="生产许可证" key="生产许可证"></el-checkbox>
             <el-checkbox v-for="(cfg, index) in formExtCfg" :label="cfg.label" :key="cfg.label"></el-checkbox>
           </el-checkbox-group>
           <el-button slot="reference" type="primary" icon="el-icon-menu"></el-button>
@@ -31,13 +32,14 @@
 
     <el-table :data="rows" border v-loading="loading">
       <!--<el-table-column type="selection"></el-table-column>-->
-      <el-table-column prop="id" label="编号" width="80px"></el-table-column>
-      <el-table-column prop="name" label="名称"></el-table-column>
-      <el-table-column prop="model" label="规格"></el-table-column>
+      <el-table-column prop="id" label="编号" sortable width="80px"></el-table-column>
+      <el-table-column prop="name" label="名称" sortable></el-table-column>
+      <el-table-column prop="model" label="规格" sortable></el-table-column>
       <el-table-column prop="company.name" label="生产商"></el-table-column>
       <el-table-column prop="unit" label="单位" width="80px"></el-table-column>
       <el-table-column prop="price" label="单价" width="100px"></el-table-column>
       <el-table-column prop="approval" label="注册号"></el-table-column>
+      <el-table-column prop="permit" label="生产许可证" v-if="optionalColumns.indexOf('生产许可证') !== -1"></el-table-column>
       <template v-for="(cfg, index) in formExtCfg">
         <el-table-column :prop="'ext.' + cfg.field" :label="cfg.label" :key="cfg.field" v-if="optionalColumns.indexOf(cfg.label) !== -1"></el-table-column>
       </template>
