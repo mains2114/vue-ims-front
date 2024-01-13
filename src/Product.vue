@@ -15,8 +15,8 @@
           </el-option>
         </el-select>
 
-        <el-input v-model="searchName" placeholder="请输入货品名称" clearable="" style="width: 180px;"></el-input>
-        <el-input v-model="searchModel" placeholder="请输入规格型号" clearable="" style="width: 180px;"></el-input>
+        <el-input v-model.trim="searchName" placeholder="请输入货品名称" clearable="" style="width: 180px;"></el-input>
+        <el-input v-model.trim="searchModel" placeholder="请输入规格型号" clearable="" style="width: 180px;"></el-input>
 
         <el-button type="primary" @click="handleSelectChange">搜索</el-button>
         <el-popover placement="bottom" trigger="click">
@@ -232,8 +232,14 @@
       },
       openFormAdd(item) {
         this.formMode = 'add';
-        this.form = {};
-        this.formExt = {};
+        if (item) {
+          // 用于复制添加
+          this.form = Object.assign({}, item);
+          this.formExt = Object.assign({}, item.ext);
+        } else {
+          this.form = {};
+          this.formExt = {};
+        }
         this.formVisible = true;
       },
       openFormEdit(item) {
