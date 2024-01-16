@@ -35,7 +35,7 @@
       <router-view></router-view>
     </el-main>
     <el-footer>
-      <el-divider>ims-laravel © 2017 - 2023</el-divider>
+      <el-divider>ims-laravel © 2017 - {{ new Date().getFullYear() }}</el-divider>
     </el-footer>
   </el-container>
 </template>
