@@ -4,7 +4,9 @@ import axios from 'axios'
 import _ from 'lodash'
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
+// import './element-variables.scss'
 import Index from './Index.vue'
+import ProductInfoDialog from './components/ProductInfoDialog.vue'
 
 // 全局配置
 window.ims = {
@@ -17,6 +19,8 @@ Vue.filter('toFixed', function(num, precision = 2) {
 Vue.filter('trimZeroDate', function(date) {
   return date === '0000-00-00' ? '' : date;
 });
+
+Vue.component('ProductInfoDialog', ProductInfoDialog);
 
 axios.interceptors.response.use(function (response) {
   // Do something with response data

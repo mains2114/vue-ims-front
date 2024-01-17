@@ -20,19 +20,16 @@
           </el-form>
 
           <el-table :data="lowStorageStock" border v-loading="loading">
-            <!--<el-table-column type="selection"></el-table-column>-->
-            <el-table-column prop="product.company.name" label="公司" width="80px"></el-table-column>
-            <el-table-column prop="product.name" label="货品"></el-table-column>
-            <el-table-column prop="product.model" label="型号"></el-table-column>
-            <el-table-column prop="num" label="数量"></el-table-column>
-            <!--<el-table-column prop="created_at" label="创建时间"></el-table-column>-->
+            <el-table-column prop="product.company.name" label="生产商" min-width="100" sortable></el-table-column>
+            <el-table-column prop="product.name" label="货品及规格" min-width="160" sortable>
+              <template slot-scope="scope">
+                <el-link type="primary" :underline="false"
+                  @click="openProductDialog(scope.row.product)"
+                >{{ scope.row.product.name + ' - ' + scope.row.product.model }}</el-link>
+              </template>
+            </el-table-column>
+            <el-table-column prop="num" label="数量" min-width="80"></el-table-column>
             <el-table-column prop="updated_at" label="更新时间"></el-table-column>
-            <!--<el-table-column label="操作">-->
-              <!--<template slot-scope="scope">-->
-                <!--<el-button size="small" @click="openFormEdit(scope.row)" type="text">编辑</el-button>-->
-                <!--<el-button size="small" @click="deleteRows('company', [scope.row.id])" type="text">删除</el-button>-->
-              <!--</template>-->
-            <!--</el-table-column>-->
           </el-table>
         </el-card>
       </el-col>
@@ -44,14 +41,17 @@
           </div>
 
           <el-table :data="nearExpireStock" border v-loading="loading2">
-            <!--<el-table-column type="selection"></el-table-column>-->
-            <el-table-column prop="product.company.name" label="公司" width="80px"></el-table-column>
-            <el-table-column prop="product.name" label="货品"></el-table-column>
-            <el-table-column prop="product.model" label="型号"></el-table-column>
-            <el-table-column prop="num" label="数量"></el-table-column>
+            <el-table-column prop="product.company.name" label="生产商" min-width="100" sortable></el-table-column>
+            <el-table-column prop="product.name" label="货品及规格" min-width="160" sortable>
+              <template slot-scope="scope">
+                <el-link type="primary" :underline="false"
+                  @click="openProductDialog(scope.row.product)"
+                >{{ scope.row.product.name + ' - ' + scope.row.product.model }}</el-link>
+              </template>
+            </el-table-column>
+            <el-table-column prop="num" label="数量" min-width="80"></el-table-column>
             <el-table-column prop="batch" label="生产批号"></el-table-column>
-            <el-table-column prop="expire" label="过期时间"></el-table-column>
-            <!--<el-table-column prop="updated_at" label="更新时间"></el-table-column>-->
+            <el-table-column prop="expire" label="过期时间" sortable></el-table-column>
             <el-table-column label="操作">
               <template slot-scope="scope">
                 <el-button size="small" type="text" disabled="" v-if="scope.row.is_lock">已锁定</el-button>
@@ -61,6 +61,8 @@
           </el-table>
         </el-card>
       </el-col>
+
+      <ProductInfoDialog ref="refProductInfoDialog"></ProductInfoDialog>
     </el-row>
   </div>
 </template>
@@ -86,6 +88,9 @@
       }
     },
     methods: {
+      openProductDialog(product) {
+        this.$refs.refProductInfoDialog.show(product);
+      },
       getRows() {
         this.loading = true;
 
