@@ -15,7 +15,7 @@
           </el-option>
         </el-select>
 
-        <el-cascader placeholder="请选择货品" clearable filterable style="width: 250px"
+        <el-cascader placeholder="请选择货品" clearable filterable
           v-model="productTreeVal"
           :options="productTree"
           :props="{expandTrigger:'click'}"
@@ -26,19 +26,24 @@
           <el-option value="in" label="入库"></el-option>
           <el-option value="out" label="出库"></el-option>
         </el-select>
-
-        <el-select v-model="optionalColumns" multiple placeholder="额外的显示列" collapse-tags>
-          <el-option value="多选框" lable="多选框"></el-option>
-          <el-option value="编号" lable="编号"></el-option>
-          <el-option value="produce_date" label="生产日期"></el-option>
-          <el-option value="expire" label="有效期"></el-option>
-          <el-option value="product_unit" label="单位"></el-option>
-          <el-option value="price" label="单价"></el-option>
-          <el-option value="price_total" label="总价"></el-option>
-          <el-option value="receipt_time" label="操作时间"></el-option>
-        </el-select>
         
         <el-button type="primary" @click="handleSelectChange">搜索</el-button>
+
+        <el-popover placement="bottom" trigger="click" ref="popoverOptionalColunns">
+          <el-checkbox-group v-model="optionalColumns">
+            <el-checkbox-button label="多选框"></el-checkbox-button>
+            <el-checkbox-button label="编号"></el-checkbox-button>
+            <el-checkbox-button label="生产日期"></el-checkbox-button>
+            <el-checkbox-button label="有效期"></el-checkbox-button>
+            <el-checkbox-button label="单位"></el-checkbox-button>
+            <el-checkbox-button label="单价"></el-checkbox-button>
+            <el-checkbox-button label="总价"></el-checkbox-button>
+            <el-checkbox-button label="操作时间"></el-checkbox-button>
+          </el-checkbox-group>
+        </el-popover>
+        <el-tooltip  effect="dark" content="显示/隐藏表格列" placement="top">
+          <el-button type="primary" icon="el-icon-menu" v-popover:popoverOptionalColunns></el-button>
+        </el-tooltip>
 
         <el-dropdown split-button type="primary" trigger="click" @command="handleCommand">
           操作
@@ -54,30 +59,35 @@
     <el-table :data="rows" border v-loading="loading" @selection-change="handleSelectionChange">
       <el-table-column type="selection" v-if="optionalColumns.indexOf('多选框') !== -1"></el-table-column>
       <el-table-column prop="id" label="编号" width="70" v-if="optionalColumns.indexOf('编号') !== -1"></el-table-column>
-      <el-table-column prop="manufacturer" label="生产厂商"></el-table-column>
-      <el-table-column prop="product_name" label="货品"></el-table-column>
-      <el-table-column prop="product_model" label="型号"></el-table-column>
+      <el-table-column prop="manufacturer" label="生产商"></el-table-column>
+      <el-table-column prop="product_name" label="货品及规格" min-width="140">
+        <template slot-scope="scope">
+          <el-link type="primary" :underline="false"
+            @click="openProductDialog(scope.row.product)"
+          >{{ scope.row.product_name + ' - ' + scope.row.product_model }}</el-link>
+        </template>
+      </el-table-column>
       <el-table-column prop="batch" label="生产批号"></el-table-column>
-      <el-table-column prop="produce_date" label="生产日期" v-if="optionalColumns.indexOf('produce_date') !== -1"></el-table-column>
-      <el-table-column prop="expire" label="有效期" v-if="optionalColumns.indexOf('expire') !== -1"></el-table-column>
+      <el-table-column prop="produce_date" label="生产日期" v-if="optionalColumns.indexOf('生产日期') !== -1"></el-table-column>
+      <el-table-column prop="expire" label="有效期" v-if="optionalColumns.indexOf('有效期') !== -1"></el-table-column>
       <el-table-column prop="receipt_type" label="操作类型">
         <template slot-scope="scope">
           {{ scope.row.receipt_type === 'in' ? '入库' : '出库' }}
         </template>
       </el-table-column>
       <el-table-column prop="num" label="数量"></el-table-column>
-      <el-table-column prop="product_unit" label="单位" v-if="optionalColumns.indexOf('product_unit') !== -1"></el-table-column>
-      <el-table-column prop="price" label="单价" v-if="optionalColumns.indexOf('price') !== -1">
+      <el-table-column prop="product_unit" label="单位" v-if="optionalColumns.indexOf('单位') !== -1"></el-table-column>
+      <el-table-column prop="price" label="单价" v-if="optionalColumns.indexOf('单价') !== -1">
         <template slot-scope="scope">
           {{ parseFloat(scope.row.price) }}
         </template>
       </el-table-column>
-      <el-table-column prop="price_total" label="总价" v-if="optionalColumns.indexOf('price_total') !== -1">
+      <el-table-column prop="price_total" label="总价" v-if="optionalColumns.indexOf('总价') !== -1">
         <template slot-scope="scope">
           {{ Math.abs(scope.row.num) * scope.row.price }}
         </template>
       </el-table-column>
-      <el-table-column prop="receipt_time" label="操作时间" v-if="optionalColumns.indexOf('receipt_time') !== -1"></el-table-column>
+      <el-table-column prop="receipt_time" label="操作时间" v-if="optionalColumns.indexOf('操作时间') !== -1"></el-table-column>
       <el-table-column prop="receipt_id" label="单据"></el-table-column>
       <el-table-column prop="company_name" label="交易公司"></el-table-column>
     </el-table>
@@ -134,6 +144,8 @@
         <el-table-column align="center" prop="expire" label="有效期"></el-table-column>
       </el-table>
     </el-dialog>
+
+    <ProductInfoDialog ref="refProductInfoDialog"></ProductInfoDialog>
   </div>
 </template>
 
@@ -170,6 +182,9 @@
       };
     },
     methods: {
+      openProductDialog(product) {
+        this.$refs.refProductInfoDialog.show(product);
+      },
       handleSelectionChange(val) {
         let rowIdArr = [];
         val.map((el, index) => {

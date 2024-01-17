@@ -18,12 +18,24 @@ module.exports = {
   module: {
     rules: [
       {
+        test: /\.s[ac]ss$/i,
+        use: [
+          // Creates `style` nodes from JS strings
+          'vue-style-loader',
+          // Translates CSS into CommonJS
+          'css-loader',
+          // Compiles Sass to CSS
+          'sass-loader',
+        ],
+      },
+      {
         test: /\.css$/,
         use: [
           'vue-style-loader',
           'css-loader'
         ],
-      },      {
+      },
+      {
         test: /\.vue$/,
         loader: 'vue-loader',
         options: {
@@ -69,7 +81,7 @@ module.exports = {
     overlay: true,
     proxy: [
       {
-        context: ['/api', '/login'],
+        context: ['/api', '/login', '/product', '/inventory'],
         target: 'http://127.0.0.1:8000',
         secure: false,
         changeOrigin: true,
