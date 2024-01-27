@@ -2,7 +2,7 @@
   <el-dialog title="货品信息" :visible.sync="productDialogVisible">
     <el-descriptions title="" direction="" :column="2" border>
       <el-descriptions-item label="ID">{{ productDialogValue.id }}</el-descriptions-item>
-      <el-descriptions-item label="生产商">{{ productDialogValue.company.full_name }}</el-descriptions-item>
+      <el-descriptions-item label="生产商">{{ productDialogValue.company && productDialogValue.company.full_name }}</el-descriptions-item>
       <el-descriptions-item label="货品">{{ productDialogValue.name }}</el-descriptions-item>
       <el-descriptions-item label="型号">{{ productDialogValue.model }}</el-descriptions-item>
       <el-descriptions-item label="单位">{{ productDialogValue.unit }}</el-descriptions-item>
