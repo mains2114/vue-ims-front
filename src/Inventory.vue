@@ -209,6 +209,7 @@
             offset: this.pageSize * (this.page - 1),
             limit: this.pageSize,
             companyId: this.companyId,
+            accountId: this.getAccountId(),
             receiptType: this.receiptType,
             // productCompany: this.productTreeVal[0],
             product: this.productTreeVal[1]

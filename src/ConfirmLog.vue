@@ -65,6 +65,9 @@
 
     <el-dialog :title="formMode === 'edit' ? '编辑' : '添加货品'" :visible.sync="formVisible">
       <el-form ref="form" v-model="form" label-position="left" label-width="110px">
+        <el-form-item label="账户">
+          <el-input v-model="form.account_name" disabled></el-input>
+        </el-form-item>
         <el-form-item label="编号" v-if="formMode === 'edit'">
           <el-input v-model="form.id" disabled></el-input>
         </el-form-item>
@@ -218,6 +221,7 @@
             limit: this.pageSize,
             companyId: this.companyId,
             productId: this.productTreeVal[1],
+            accountId: this.getAccountId(),
           }
         }).then(response => {
           this.rows = response.data.rows || [];

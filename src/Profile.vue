@@ -34,8 +34,8 @@ export default {
     }
   },
   created() {
-    this.user = window.ims.user || {};
-    this.account = window.ims.account || {};
+    this.user = window.$ims.user || {};
+    this.account = window.$ims.account || {};
   }
 }
 </script>

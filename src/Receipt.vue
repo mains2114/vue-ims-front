@@ -85,6 +85,9 @@
           </el-select>
           <el-input v-model="form.company_name" disabled v-else></el-input>
         </el-form-item>
+        <el-form-item label="所属账户" v-if="form.account_name">
+          <el-input v-model="form.account_name" disabled></el-input>
+        </el-form-item>
 
       <el-table :data="formRows">
         <el-table-column align="center" prop="product.name" label="品名及规格" width="240px">
@@ -178,7 +181,7 @@
       methodIsEnableEdit(row) {
         // 允许修改最近1天创建的单据
         let isRecent = new Date(row.created_at).getTime() + 86400 * 1000 > new Date().getTime();
-        return isRecent || (window.ims && window.ims.enableReceiptEdit);
+        return isRecent || window.$ims.enableReceiptEdit;
       },
       exportReceipt(receiptId) {
         window.open(this.url('/receipt/export/' + receiptId))
@@ -193,6 +196,7 @@
             offset: this.pageSize * (this.page - 1),
             limit: this.pageSize,
             companyId: this.companyId,
+            accountId: this.getAccountId(),
             search: this.receiptSearch,
             type: this.receiptType
           }

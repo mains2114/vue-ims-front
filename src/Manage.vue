@@ -7,6 +7,8 @@
         <el-button type="primary" @click="openFormAdd()">添加</el-button>
 
         <el-button type="primary" @click="handleSelectChange">搜索</el-button>
+
+        <el-button type="success" @click="resetAccount">重置账户选择</el-button>
       </el-col>
     </el-row>
     <br>
@@ -62,6 +64,9 @@
 </template>
 
 <script>
+import { mapStores } from 'pinia'
+import { useAccountStore } from './stores/account.js'
+
   export default {
     name: "Company",
     data() {
@@ -84,6 +89,9 @@
           getUsers: this.url('/api/account/getUsers'),
         }
       };
+    },
+    computed: {
+      ...mapStores(useAccountStore)
     },
     methods: {
       getRows() {
@@ -142,9 +150,16 @@
         this.formVisible = true;
       },
       switchAccount(item) {
-        window.ims.account = item;
+        this.accountStore.switchAccount(item);
         this.$message({
-          message: '已切换为：' + item.name,
+          message: '当前账户已切换为：' + item.name,
+          type: 'success'
+        });
+      },
+      resetAccount() {
+        this.accountStore.switchAccount(null);
+        this.$message({
+          message: '当前账户选择已重置',
           type: 'success'
         });
       },

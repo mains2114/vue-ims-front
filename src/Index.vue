@@ -19,7 +19,7 @@
         <el-menu-item index="/changes">更新日志</el-menu-item>
         <el-dropdown class="ims-user-info" @command="handleCommand">
           <span class="el-dropdown-link">
-            {{ username }}
+            {{ accountStore.account && accountStore.account.name + ' |' }} {{ username }}
             <i class="el-icon-arrow-down el-icon--right"></i>
           </span>
           <el-dropdown-menu slot="dropdown">
@@ -41,6 +41,9 @@
 </template>
 
 <script>
+import { mapStores } from 'pinia'
+import { useAccountStore } from './stores/account.js'
+
   export default {
     name: "Index",
     data() {
@@ -48,13 +51,16 @@
         username: window.$USERNAME || '用户名',
       };
     },
+    computed: {
+      ...mapStores(useAccountStore)
+    },
     methods: {
       getProfile() {
+        this.accountStore.recovery();
         this.$http.get(this.url('/api/account/getProfile')).then((response) => {
           let resp = response.data;
           this.username = resp.data.user.name;
-          window.ims.user = resp.data.user;
-          window.ims.account = resp.data.account;
+          this.accountStore.setUser(resp.data.user);
         });
       },
       handleCommand(command) {

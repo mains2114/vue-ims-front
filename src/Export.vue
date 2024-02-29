@@ -262,6 +262,7 @@
       },
       submitReceipt() {
         var form = {
+          account_id: this.getAccountId(),
           company_id: this.form.companyId,
           date: this.form.date,
           rows: []

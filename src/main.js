@@ -7,10 +7,13 @@ import 'element-ui/lib/theme-chalk/index.css'
 // import './element-variables.scss'
 import Index from './Index.vue'
 import ProductInfoDialog from './components/ProductInfoDialog.vue'
+import { createPinia, PiniaVuePlugin } from 'pinia'
 
 // 全局配置
-window.ims = {
+window.$ims = {
   enableReceiptEdit: false,
+  user: null,
+  account: null,
 };
 
 Vue.filter('toFixed', function(num, precision = 2) {
@@ -36,6 +39,9 @@ axios.interceptors.response.use(function (response) {
   return Promise.reject(error);
 });
 Vue.prototype.$http = axios;
+Vue.prototype.getAccountId = () => {
+  return window.$ims.account && window.$ims.account.id || 0;
+}
 
 // Vue.prototype.url = api => 'http://ims.local:8080' + api;
 Vue.prototype.url = api => api;
@@ -69,6 +75,8 @@ Vue.prototype.apiList = () => {
 };
 Vue.use(ElementUI);
 Vue.use(Router);
+Vue.use(PiniaVuePlugin);
+const pinia = createPinia()
 
 const routes = [
   { path: '/', component: () => import('./Dashboard.vue') },
@@ -93,6 +101,7 @@ const router = new Router({
 
 new Vue({
   router,
+  pinia,
   el: '#app',
   render: h => h(Index)
 });
