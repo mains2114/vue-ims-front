@@ -127,7 +127,7 @@
           <el-input v-model="form.bid"></el-input>
         </el-form-item>
         <el-divider></el-divider>
-        <el-form-item v-for="(cfg, index) in formExtCfg" :label="cfg.label">
+        <el-form-item v-for="(cfg, index) in formExtCfg" :label="cfg.label" :key="cfg.label">
           <el-input v-model="formExt[cfg.field]"></el-input>
         </el-form-item>
         <el-form-item>

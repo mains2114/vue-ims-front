@@ -301,6 +301,7 @@
 
         form.rows = this.tableRows.map((row, index) => {
           return {
+            account_id: this.getAccountId(),
             product_id: row.id,
             batch: row.batch,
             produce_date: row.produce_date,

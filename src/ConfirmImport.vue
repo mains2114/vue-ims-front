@@ -210,6 +210,7 @@
         this.$http.get(this.urls.getConfirmLog, {
           params: {
             productCompanyId: this.productsFilter,
+            accountId: this.getAccountId(),
             limit: 100,
             sort: 'id',
             order: 'desc'
@@ -233,6 +234,7 @@
       },
       submitReceipt() {
         var form = {
+          account_id: this.getAccountId(),
           company_id: this.form.companyId,
           rows: []
         };
