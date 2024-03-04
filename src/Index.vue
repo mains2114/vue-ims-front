@@ -59,8 +59,12 @@ import { useAccountStore } from './stores/account.js'
         this.accountStore.recovery();
         this.$http.get(this.url('/api/account/getProfile')).then((response) => {
           let resp = response.data;
-          this.username = resp.data.user.name;
-          this.accountStore.setUser(resp.data.user);
+          let user = resp.data.user;
+          this.username = user.name;
+          this.accountStore.setUser(user);
+          if (!this.accountStore.account && user.account) {
+            this.accountStore.switchAccount(user.account);
+          }
         });
       },
       handleCommand(command) {
@@ -75,6 +79,7 @@ import { useAccountStore } from './stores/account.js'
         }
       },
       logout() {
+        this.accountStore.switchAccount(null);
         this.$http.post(this.url('/logout')).then(() => {
           window.location.href = '/';
         });
