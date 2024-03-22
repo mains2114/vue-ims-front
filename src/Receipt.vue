@@ -88,8 +88,17 @@
         <el-form-item label="所属账户" v-if="form.account_name">
           <el-input v-model="form.account_name" disabled></el-input>
         </el-form-item>
+        <el-form-item label="制单">
+          <el-input v-model="form.creator" :disabled="!computedIsEdit"></el-input>
+        </el-form-item>
+        <el-form-item label="复核">
+          <el-input v-model="form.reviewer" :disabled="!computedIsEdit"></el-input>
+        </el-form-item>
+        <el-form-item label="送货人">
+          <el-input v-model="form.deliverer" :disabled="!computedIsEdit"></el-input>
+        </el-form-item>
 
-      <el-table :data="formRows">
+      <el-table :data="formRows" show-summary :summary-method="getSummaries">
         <el-table-column align="center" prop="product.name" label="品名及规格" width="240px">
           <template slot-scope="scope">
             {{ scope.row.product.name }} - {{ scope.row.product.model }}
@@ -178,6 +187,15 @@
       },
     },
     methods: {
+      getSummaries(param) {
+        const sums = [];
+        const total = this.formRows.reduce((prev, curr) => {
+          return prev + curr.price * Math.abs(curr.num);
+        }, 0);
+        sums[4] = '合计金额'
+        sums[5] = isNaN(total) ? '0.00' : total.toFixed(2);
+        return sums;
+      },
       methodIsEnableEdit(row) {
         // 允许修改最近1天创建的单据
         let isRecent = new Date(row.created_at).getTime() + 86400 * 1000 > new Date().getTime();
@@ -271,6 +289,9 @@
           id: this.form.id,
           date: this.form.date,
           company_id: this.form.company_id,
+          creator: this.form.creator,
+          reviewer: this.form.reviewer,
+          deliverer: this.form.deliverer,
           rows: _.map(this.formRows, (item) => {
             return {
               id: item.id,

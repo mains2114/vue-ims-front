@@ -42,6 +42,9 @@ Vue.prototype.$http = axios;
 Vue.prototype.getAccountId = () => {
   return window.$ims.account && window.$ims.account.id || 0;
 }
+Vue.prototype.getUsername = () => {
+  return window.$ims.user && window.$ims.user.name || '';
+}
 
 // Vue.prototype.url = api => 'http://ims.local:8080' + api;
 Vue.prototype.url = api => api;
