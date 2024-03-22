@@ -28,7 +28,7 @@
       </el-col>
     </el-row>
 
-    <el-table border="" :data="tableRows">
+    <el-table border="" :data="tableRows" show-summary :summary-method="getSummaries">
       <!--<el-table-column prop="id" label="编号" width="60"></el-table-column>-->
       <el-table-column prop="name" label="名称"></el-table-column>
       <el-table-column prop="model" label="规格"></el-table-column>
@@ -80,10 +80,28 @@
     <br>
 
     <el-row style="text-align: left;">
-      <el-col :span="6"><el-form-item label="收货人："><el-input v-model="form.receiver"></el-input></el-form-item></el-col>
-      <el-col :span="6"><el-form-item label="送货人："><el-input v-model="form.delivery"></el-input></el-form-item></el-col>
-      <el-col :span="6"><el-form-item label="制单："><el-input v-model="form.creator"></el-input></el-form-item></el-col>
-      <el-col :span="6"><el-form-item label="审核："><el-input v-model="form.reviewer"></el-input></el-form-item></el-col>
+      <el-col :span="6"><el-form-item label="收货人："><el-input v-model="form.receiver" disabled></el-input></el-form-item></el-col>
+      <el-col :span="6">
+        <el-form-item label="送货人：">
+          <el-select v-model="form.deliverer" size="default" allow-create filterable clearable default-first-option>
+            <el-option v-for="item in userOptions" :key="item.value" :label="item.value" :value="item.value"></el-option>
+          </el-select>
+        </el-form-item>
+      </el-col>
+      <el-col :span="6">
+        <el-form-item label="制单：">
+          <el-select v-model="form.creator" size="default" allow-create filterable clearable default-first-option>
+            <el-option v-for="item in userOptions" :key="item.value" :label="item.value" :value="item.value"></el-option>
+          </el-select>
+        </el-form-item>
+      </el-col>
+      <el-col :span="6">
+        <el-form-item label="复核：">
+          <el-select v-model="form.reviewer" size="default" allow-create filterable clearable default-first-option>
+            <el-option v-for="item in userOptions" :key="item.value" :label="item.value" :value="item.value"></el-option>
+          </el-select>
+        </el-form-item>
+      </el-col>
     </el-row>
 
     <!-- <el-row style="text-align: left;">
@@ -144,7 +162,11 @@
         form: {
           companyId: null,
           date: new Date(),
+          creator: this.getUsername(),
+          reviewer: '',
+          deliverer: '',
         },
+        userOptions: [],
         formLabelWidth: '120px',
         companyType: null,
         companies: [],
@@ -155,6 +177,7 @@
         productsSelected: [],
         components: {},
         urls: {
+          getUsers: this.url('/api/account/getUsers'),
           getRows: this.url('/api/getCompanies'),
           add: this.url('/company/create'),
           edit: this.url('/company/'),
@@ -206,6 +229,23 @@
     filters: {
     },
     methods: {
+      getSummaries(param) {
+        const sums = [];
+        const total = this.tableRows.reduce((prev, curr) => {
+          return prev + curr.price * curr.num2;
+        }, 0);
+        sums[5] = '合计金额'
+        sums[6] = isNaN(total) ? '0.00' : total.toFixed(2);
+        return sums;
+      },
+      getUsers() {
+        this.$http.get(this.urls.getUsers, {params: {sort: 'id'}}).then(response => {
+          let users = response.data.rows;
+          this.userOptions = users.map((el, index) => {
+            return {value: el.name};
+          })
+        })
+      },
       getManufacturers() {
         this.$http.get(this.urls.getAllCompanies).then(response => {
           this.companies = response.data.rows;
@@ -265,6 +305,9 @@
           account_id: this.getAccountId(),
           company_id: this.form.companyId,
           date: this.form.date,
+          creator: this.form.creator,
+          reviewer: this.form.reviewer,
+          deliverer: this.form.deliverer,
           rows: []
         };
 
@@ -298,6 +341,7 @@
       this.getManufacturers();
       this.getProductTree();
       this.getProducts();
+      this.getUsers();
     }
   }
 </script>
