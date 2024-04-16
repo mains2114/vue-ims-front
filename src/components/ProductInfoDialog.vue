@@ -11,6 +11,8 @@
       <el-descriptions-item label="生产许可证">{{ productDialogValue.permit }}</el-descriptions-item>
       <el-descriptions-item label="医保编码">{{ productDialogValue.ext && productDialogValue.ext.yb_code }}</el-descriptions-item>
       <el-descriptions-item label="挂网价">{{ productDialogValue.ext && productDialogValue.ext.price_online }}</el-descriptions-item>
+      <el-descriptions-item label="包装规格">{{ productDialogValue.ext && productDialogValue.ext.packing_size }}</el-descriptions-item>
+      <el-descriptions-item label="库存预警值">{{ productDialogValue.ext && productDialogValue.ext.warning_num }}</el-descriptions-item>
     </el-descriptions>
   </el-dialog>
 </template>
