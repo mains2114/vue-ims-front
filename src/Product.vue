@@ -168,6 +168,8 @@
         formExtCfg: [
           { field:'yb_code', label:'医保编码' },
           { field:'price_online', label:'挂网价' },
+          { field:'packing_size', label:'包装规格' },
+          { field:'warning_num', label:'库存预警值' },
         ],
         dialog2Visible: false,
         dialog2Rows: [],

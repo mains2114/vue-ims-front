@@ -84,7 +84,7 @@
       </el-table-column>
       <el-table-column prop="price_total" label="总价" v-if="optionalColumns.indexOf('总价') !== -1">
         <template slot-scope="scope">
-          {{ Math.abs(scope.row.num) * scope.row.price }}
+          {{ Math.abs(scope.row.num * scope.row.price).toFixed(2) }}
         </template>
       </el-table-column>
       <el-table-column prop="receipt_time" label="操作时间" v-if="optionalColumns.indexOf('操作时间') !== -1"></el-table-column>
