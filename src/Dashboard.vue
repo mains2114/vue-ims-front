@@ -8,18 +8,15 @@
           </div>
 
           <el-form :inline="true">
-            <el-form-item label="库存预警范围">
-              <el-input v-model="lowStorageParams.min"></el-input>
-            </el-form-item>
-            <el-form-item label="-">
-              <el-input v-model="lowStorageParams.max"></el-input>
-            </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="getRows">查询</el-button>
+              <el-radio-group v-model="lowStorageParams.showAll" @change="getRows">
+                <el-radio-button label="1">全部</el-radio-button>
+                <el-radio-button label="0">低库存预警</el-radio-button>
+              </el-radio-group>
             </el-form-item>
           </el-form>
 
-          <el-table :data="lowStorageStock" border v-loading="loading">
+          <el-table :data="tableRows1" :rowClassName="tableRowClassName" border v-loading="loading">
             <el-table-column prop="product.company.name" label="生产商" min-width="100" sortable></el-table-column>
             <el-table-column prop="product.name" label="货品及规格" min-width="160" sortable>
               <template slot-scope="scope">
@@ -29,8 +26,16 @@
               </template>
             </el-table-column>
             <el-table-column prop="num" label="数量" min-width="80"></el-table-column>
+            <el-table-column prop="warning_num" label="预警值" min-width="80"></el-table-column>
             <el-table-column prop="updated_at" label="更新时间"></el-table-column>
           </el-table>
+          <br>
+          <el-pagination layout="total, sizes, prev, pager, next" background
+                   :total="pager1.total"
+                   :page-size.sync="pager1.size"
+                   :current-page.sync="pager1.page"
+                   :page-sizes="[10, 20, 50]">
+          </el-pagination>
         </el-card>
       </el-col>
 
@@ -40,7 +45,7 @@
             <span>过期预警</span>
           </div>
 
-          <el-table :data="nearExpireStock" border v-loading="loading2">
+          <el-table :data="tableRows2" border v-loading="loading2">
             <el-table-column prop="product.company.name" label="生产商" min-width="100" sortable></el-table-column>
             <el-table-column prop="product.name" label="货品及规格" min-width="160" sortable>
               <template slot-scope="scope">
@@ -59,6 +64,13 @@
               </template>
             </el-table-column>
           </el-table>
+          <br>
+          <el-pagination layout="total, sizes, prev, pager, next" background
+                   :total="pager2.total"
+                   :page-size.sync="pager2.size"
+                   :current-page.sync="pager2.page"
+                   :page-sizes="[10, 20, 50]">
+          </el-pagination>
         </el-card>
       </el-col>
 
@@ -76,16 +88,37 @@
         loading2: false,
         lowStorageStock:[],
         lowStorageParams: {
-          min: 0,
-          max: 100
+          showAll: 1,
         },
         nearExpireStock: [],
+        pager1: {
+          total: 0,
+          size: 10,
+          page: 1,
+        },
+        pager2: {
+          total: 0,
+          size: 10,
+          page: 1,
+        },
         urls: {
           getInventoryWarning: this.url('/api/getInventoryWarning'),
           getExpireWarning: this.url('/api/getExpireWarning'),
           lockStorage: this.url('/api/lockStorage'),
         }
       }
+    },
+    computed: {
+      tableRows1() {
+        let start = (this.pager1.page - 1) * this.pager1.size;
+        let end = start + this.pager1.size;
+        return this.lowStorageStock.slice(start, end);
+      },
+      tableRows2() {
+        let start = (this.pager2.page - 1) * this.pager2.size;
+        let end = start + this.pager2.size;
+        return this.nearExpireStock.slice(start, end);
+      },
     },
     methods: {
       openProductDialog(product) {
@@ -96,16 +129,22 @@
 
         this.$http.get(this.urls.getInventoryWarning, {
           params: {
-            min: this.lowStorageParams.min,
-            max: this.lowStorageParams.max,
+            ...this.lowStorageParams,
             sort: 'id',
             order: 'desc',
           }
         }).then(response => {
           this.lowStorageStock = response.data.rows || [];
+          this.pager1.total = this.lowStorageStock.size;
 
           this.loading = false;
         })
+      },
+      tableRowClassName({row, rowIndex}) {
+        if (row.num - row.warning_num <= 0) {
+          return 'warning-row';
+        }
+        return '';
       },
       getRows2() {
         this.loading2 = true;
@@ -117,6 +156,7 @@
           }
         }).then(response => {
           this.nearExpireStock = response.data.rows || [];
+          this.pager2.total = this.nearExpireStock.length;
 
           this.loading2 = false;
         })
@@ -146,6 +186,8 @@
   }
 </script>
 
-<style scoped>
-
+<style>
+.el-table .warning-row {
+  background: oldlace;
+}
 </style>
