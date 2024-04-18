@@ -135,7 +135,7 @@
           }
         }).then(response => {
           this.lowStorageStock = response.data.rows || [];
-          this.pager1.total = this.lowStorageStock.size;
+          this.pager1.total = this.lowStorageStock.length;
 
           this.loading = false;
         })
