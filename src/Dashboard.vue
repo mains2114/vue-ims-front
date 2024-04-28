@@ -17,7 +17,7 @@
           </el-form>
 
           <el-table :data="tableRows1" :rowClassName="tableRowClassName" border v-loading="loading">
-            <el-table-column prop="product.company.name" label="生产商" min-width="100" sortable></el-table-column>
+            <el-table-column prop="product.company.name" label="生产商" min-width="100" sortable :filters="pager1.filters" :filter-method="companyFilter"></el-table-column>
             <el-table-column prop="product.name" label="货品及规格" min-width="160" sortable>
               <template slot-scope="scope">
                 <el-link type="primary" :underline="false"
@@ -27,7 +27,6 @@
             </el-table-column>
             <el-table-column prop="num" label="数量" min-width="80"></el-table-column>
             <el-table-column prop="warning_num" label="预警值" min-width="80"></el-table-column>
-            <el-table-column prop="updated_at" label="更新时间"></el-table-column>
           </el-table>
           <br>
           <el-pagination layout="total, sizes, prev, pager, next" background
@@ -95,6 +94,7 @@
           total: 0,
           size: 10,
           page: 1,
+          filters: [],
         },
         pager2: {
           total: 0,
@@ -121,6 +121,9 @@
       },
     },
     methods: {
+      companyFilter(value, row, column) {
+        return value == row.product.company.name;
+      },
       openProductDialog(product) {
         this.$refs.refProductInfoDialog.show(product);
       },
@@ -136,6 +139,11 @@
         }).then(response => {
           this.lowStorageStock = response.data.rows || [];
           this.pager1.total = this.lowStorageStock.length;
+
+          let companyArr = this.lowStorageStock.map((el, idx) => {
+            return el.product.company.name;
+          });
+          this.pager1.filters = Array.from(new Set(companyArr), (el, index) => { return { text: el, value: el }; });
 
           this.loading = false;
         })
