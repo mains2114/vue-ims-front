@@ -19,10 +19,9 @@
         <el-input v-model.trim="searchModel" placeholder="请输入规格型号" clearable="" style="width: 180px;"></el-input>
 
         <el-button type="primary" @click="handleSelectChange">搜索</el-button>
-        <el-popover placement="bottom" trigger="click">
-          <el-checkbox-group v-model="optionalColumns">
-            <el-checkbox label="生产许可证" key="生产许可证"></el-checkbox>
-            <el-checkbox v-for="(cfg, index) in formExtCfg" :label="cfg.label" :key="cfg.label"></el-checkbox>
+        <el-popover placement="bottom" trigger="click" :width="100">
+          <el-checkbox-group v-model="tableCols" @change="saveTableCols">
+            <el-checkbox v-for="(col, index) in tableColsDef" :label="col.label" :key="col.label" style="display: block; line-height: 32px;"></el-checkbox>
           </el-checkbox-group>
           <el-button slot="reference" type="primary" icon="el-icon-menu"></el-button>
         </el-popover>
@@ -32,18 +31,18 @@
 
     <el-table :data="rows" border v-loading="loading">
       <!--<el-table-column type="selection"></el-table-column>-->
-      <el-table-column prop="id" label="编号" sortable width="80px"></el-table-column>
-      <el-table-column prop="name" label="名称" sortable></el-table-column>
-      <el-table-column prop="model" label="规格" sortable></el-table-column>
-      <el-table-column prop="company.name" label="生产商"></el-table-column>
-      <el-table-column prop="unit" label="单位" width="80px"></el-table-column>
-      <el-table-column prop="price" label="单价" width="100px"></el-table-column>
-      <el-table-column prop="approval" label="注册号"></el-table-column>
-      <el-table-column prop="permit" label="生产许可证" v-if="optionalColumns.indexOf('生产许可证') !== -1"></el-table-column>
+      <el-table-column prop="id" label="编号" sortable width="80px" v-if="ifColumnShow('编号')"></el-table-column>
+      <el-table-column prop="name" label="名称" sortable v-if="ifColumnShow('名称')"></el-table-column>
+      <el-table-column prop="model" label="规格" sortable v-if="ifColumnShow('规格')"></el-table-column>
+      <el-table-column prop="company.name" label="生产商" v-if="ifColumnShow('生产商')"></el-table-column>
+      <el-table-column prop="unit" label="单位" width="80px" v-if="ifColumnShow('单位')"></el-table-column>
+      <el-table-column prop="price" label="单价" width="100px" v-if="ifColumnShow('单价')"></el-table-column>
+      <el-table-column prop="approval" label="注册号" v-if="ifColumnShow('注册号')"></el-table-column>
+      <el-table-column prop="permit" label="生产许可证" v-if="ifColumnShow('生产许可证')"></el-table-column>
       <template v-for="(cfg, index) in formExtCfg">
-        <el-table-column :prop="'ext.' + cfg.field" :label="cfg.label" :key="cfg.field" v-if="optionalColumns.indexOf(cfg.label) !== -1"></el-table-column>
+        <el-table-column :prop="'ext.' + cfg.field" :label="cfg.label" :key="cfg.field" v-if="ifColumnShow(cfg.label)"></el-table-column>
       </template>
-      <el-table-column prop="" label="库存">
+      <el-table-column prop="" label="库存" v-if="ifColumnShow('库存')">
         <template slot-scope="scope">
           <el-popover trigger="click">
             <el-table :data="scope.row.storage">
@@ -58,7 +57,7 @@
           </el-popover>
         </template>
       </el-table-column>
-      <el-table-column label="操作">
+      <el-table-column label="操作" v-if="ifColumnShow('操作')">
         <template slot-scope="scope">
           <el-button size="small" @click="openFormEdit(scope.row)" type="text">编辑</el-button>
           <el-button size="small" @click="openFormAdd(scope.row)" type="text">复制</el-button>
@@ -152,7 +151,6 @@
     data() {
       return {
         loading: false,
-        optionalColumns: [],
         companyId: '',
         companies: [],
         searchName: '',
@@ -171,6 +169,19 @@
           { field:'packing_size', label:'包装规格' },
           { field:'warning_num', label:'库存预警值' },
         ],
+        tableCols: [],
+        tableColsDef: [
+          { label: '编号', },
+          { label: '名称', },
+          { label: '规格', },
+          { label: '生产商', },
+          { label: '单位', },
+          { label: '单价', },
+          { label: '注册号', },
+          { label: '生产许可证', checked: false, },
+          { label: '库存', },
+          { label: '操作', },
+        ],
         dialog2Visible: false,
         dialog2Rows: [],
         urls: {
@@ -183,6 +194,22 @@
       };
     },
     methods: {
+      ifColumnShow(col) {
+        return this.tableCols.indexOf(col) !== -1;
+      },
+      saveTableCols() {
+        // console.log('saveTableCols', this.$route)
+        let key = this.$route.path + '#tableCols';
+        localStorage.setItem(key, JSON.stringify(this.tableCols));
+      },
+      restoreTableCols() {
+        // console.log('restoreTableCols')
+        let key = this.$route.path + '#tableCols';
+        let value = localStorage.getItem(key)
+        if (value) {
+          this.tableCols = JSON.parse(value);
+        }
+      },
       getRows() {
         this.loading = true;
 
@@ -199,7 +226,7 @@
         }).then(response => {
           this.rows = response.data.rows || [];
           this.total = response.data.total || 0;
-
+        }).finally(() => {
           this.loading = false;
         })
       },
@@ -278,6 +305,19 @@
     created() {
       this.getAllCompanies();
       this.getRows();
+
+      this.tableColsDef.splice(8, 0, ...this.formExtCfg.map((item) => {
+        return { label: item.label, checked: false, };
+      }))
+      // console.log(this.tableColsDef.map((item) => item.label))
+      this.tableCols.splice(0, 0, ...this.tableColsDef.filter((item) => {
+        return item.checked !== false;
+      }).map((item) => {
+        return item.label;
+      }))
+      // console.log(this.tableCols)
+      this.restoreTableCols();
+      // console.log(this.tableCols)
     }
   }
 </script>
