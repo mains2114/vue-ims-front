@@ -16,7 +16,9 @@
           <el-menu-item index="/purchaseManage/confirmForm">采购验收</el-menu-item>
           <el-menu-item index="/purchaseManage/confirmImport">验收入库</el-menu-item>
         </el-submenu>
-        <el-menu-item index="/changes">更新日志</el-menu-item>
+        <el-badge value="new" :hidden="cacheStore.checkedVer >= cacheStore.changesVer">
+          <el-menu-item index="/changes">更新日志</el-menu-item>
+        </el-badge>
         <el-dropdown class="ims-user-info" @command="handleCommand">
           <span class="el-dropdown-link">
             {{ accountStore.account && accountStore.account.name + ' |' }} {{ username }}
@@ -43,6 +45,7 @@
 <script>
 import { mapStores } from 'pinia'
 import { useAccountStore } from './stores/account.js'
+import { useCacheStore } from './stores/cache.js';
 
   export default {
     name: "Index",
@@ -52,7 +55,8 @@ import { useAccountStore } from './stores/account.js'
       };
     },
     computed: {
-      ...mapStores(useAccountStore)
+      ...mapStores(useAccountStore),
+      ...mapStores(useCacheStore),
     },
     methods: {
       getProfile() {
@@ -87,6 +91,7 @@ import { useAccountStore } from './stores/account.js'
     },
     created() {
       this.getProfile();
+      this.cacheStore.restoreCheckedVer();
     }
   }
 </script>
@@ -115,5 +120,12 @@ import { useAccountStore } from './stores/account.js'
   }
   i.el-input__icon.el-icon-date {
     display: none;
+  }
+  .el-main h3 {
+    margin-top: 0;
+  }
+  .el-badge__content.is-fixed {
+    top: 10px;
+    right: 20px;
   }
 </style>

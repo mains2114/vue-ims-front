@@ -1,5 +1,22 @@
+<script setup>
+import { ref, onMounted, getCurrentInstance } from 'vue'
+import { useCacheStore } from './stores/cache.js';
+
+const cache = useCacheStore()
+
+onMounted(() => {
+  cache.updateCheckedVer()
+})
+</script>
 <template>
   <el-form>
+    <el-row>
+      <h3>2024-07-18</h3>
+      <p>1. 货品页面：自动记忆表格列配置</p>
+      <p>2. 单据页面：自动记忆表格列配置，新增金额、货品字段，新增账户筛选</p>
+      <p>3. 流水页面：自动记忆表格列配置，调整列顺序，新增账户、时间筛选，货品筛选支持选择货品公司</p>
+      <p>4. 主页面：库存预警、过期预警取消分页，修改为固定高度滚动</p>
+    </el-row>
     <el-row>
       <h3>2024-04-18</h3>
       <p>1. 主页面：库存预警逻辑调整，按货品的库存预警值执行，新增分页</p>
@@ -112,11 +129,6 @@
   </el-form>
 </template>
 
-<script>
-export default {
-  name: "Changes.vue"
-}
-</script>
 
 <style scoped>
 
