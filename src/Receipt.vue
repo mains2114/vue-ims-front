@@ -7,10 +7,8 @@
       <el-col :span="24">
         <!-- <el-button type="primary" @click="$router.push('import')">入库</el-button> -->
         <el-button type="primary" @click="$router.push('export')">出库</el-button>
-        <el-select v-model="companyId" @change="handleSelectChange" filterable clearable placeholder="请选择公司">
-          <el-option v-for="item in companies" :key="item.id" :value="item.id" :label="item.id + '. ' + item.name">
-          </el-option>
-        </el-select>
+        <AccountSelect v-bind:modelValue.sync="accountId"></AccountSelect>
+        <CompanySelect v-bind:modelValue.sync="companyId"></CompanySelect>
         <el-select v-model="receiptType" @change="handleSelectChange" clearable placeholder="选择单据类型">
           <el-option value="in" label="入库"></el-option>
           <el-option value="out" label="出库"></el-option>
@@ -81,10 +79,7 @@
             :disabled="!computedIsEdit"></el-date-picker>
         </el-form-item>
         <el-form-item label="购货单位">
-          <el-select v-model="form.company_id" filterable v-if="computedIsEdit">
-            <el-option v-for="item in companies" :key="item.id" :value="item.id" :label="item.id + '. ' + item.name">
-            </el-option>
-          </el-select>
+          <CompanySelect v-bind:modelValue.sync="form.company_id" v-if="computedIsEdit"></CompanySelect>
           <el-input v-model="form.company_name" disabled v-else></el-input>
         </el-form-item>
         <el-form-item label="所属账户" v-if="form.account_name">
@@ -160,6 +155,8 @@
 <style scoped></style>
 <script setup>
 import { ref, onMounted, computed, getCurrentInstance } from 'vue'
+import AccountSelect from './components/AccountSelect.vue'
+import CompanySelect from './components/CompanySelect.vue'
 
 const $route = getCurrentInstance().proxy.$route;
 const $http = getCurrentInstance().proxy.$http;
@@ -168,7 +165,7 @@ const getAccountId = getCurrentInstance().proxy.getAccountId;
 
 const loading = ref(false)
 const companyId = ref('')
-const companies = ref([])
+const accountId = ref('')
 const receiptType = ref('')
 const receiptSearch = ref('')
 const rows = ref([])
@@ -281,7 +278,7 @@ function getRows() {
       offset: pageSize.value * (page.value - 1),
       limit: pageSize.value,
       companyId: companyId.value,
-      accountId: getAccountId(),
+      accountId: accountId.value,
       search: receiptSearch.value,
       type: receiptType.value,
     }
@@ -305,11 +302,6 @@ function deleteRows(module, records) {
     }
     console.log(response);
     $message.error(response.data.msg || '请求错误');
-  });
-}
-function getAllCompanies() {
-  $http.get(urls.getAllCompanies).then(response => {
-    companies.value.splice(0, companies.value.length, ...response.data.rows);
   });
 }
 function handleSizeChange(val) {
@@ -377,7 +369,6 @@ function submitForm() {
 }
 
 onMounted(() => {
-  getAllCompanies();
   getRows();
   initTableCols();
   restoreTableCols();

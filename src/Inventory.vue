@@ -7,16 +7,14 @@
         <!-- <el-button type="primary" @click="$router.push('export')">出库</el-button> -->
         <el-date-picker v-model="daterange" type="daterange" value-format="yyyy-MM-dd" range-separator="~"
           start-placeholder="开始日期" end-placeholder="结束日期" unlink-panels :picker-options="pickerOptions"></el-date-picker>
-        <el-select v-model="companyId" @change="handleSelectChange" filterable clearable placeholder="请选择交易公司">
-          <el-option v-for="item in companies" :key="item.id" :value="item.id" :label="item.id + '. ' + item.name">
-          </el-option>
-        </el-select>
-        <el-cascader placeholder="请选择货品" clearable filterable v-model="productTreeVal" :options="productTree"
-          :props="{ expandTrigger: 'click' }" @change="handleSelectChange"></el-cascader>
         <el-select v-model="receiptType" @change="handleSelectChange" clearable placeholder="选择单据类型">
           <el-option value="in" label="入库"></el-option>
           <el-option value="out" label="出库"></el-option>
         </el-select>
+        <AccountSelect v-bind:modelValue.sync="accountId"></AccountSelect>
+        <CompanySelect v-bind:modelValue.sync="companyId"></CompanySelect>
+        <el-cascader placeholder="请选择货品" clearable filterable v-model="productTreeVal" :options="productTree"
+          :props="{ expandTrigger: 'click', checkStrictly: true }" @change="handleSelectChange"></el-cascader>
         <el-button type="primary" @click="handleSelectChange">搜索</el-button>
         <el-popover placement="bottom" trigger="click" ref="popoverOptionalColunns">
           <el-checkbox-group v-model="tableCols" @change="saveTableCols">
@@ -46,6 +44,7 @@
           {{ scope.row.receipt_type === 'in' ? '入库' : '出库' }}
         </template>
       </el-table-column>
+      <el-table-column prop="receipt.date" label="单据日期" v-if="ifColumnShow('单据日期')"></el-table-column>
       <el-table-column prop="company_name" label="交易公司" v-if="ifColumnShow('交易公司')"></el-table-column>
       <el-table-column prop="manufacturer" label="生产商" v-if="ifColumnShow('生产商')"></el-table-column>
       <el-table-column prop="product_name" label="货品及规格" min-width="140" v-if="ifColumnShow('货品及规格')">
@@ -85,10 +84,7 @@
           <el-date-picker type="date" v-model="form.date" value-format="yyyy-MM-dd"></el-date-picker>
         </el-form-item>
         <el-form-item label="购货单位">
-          <el-select v-model="form.company_id" filterable>
-            <el-option v-for="item in companies" :key="item.id" :value="item.id" :label="item.id + '. ' + item.name">
-            </el-option>
-          </el-select>
+          <CompanySelect v-bind:modelValue.sync="form.company_id"></CompanySelect>
         </el-form-item>
       </el-form>
       <el-table :data="formRows">
@@ -121,6 +117,8 @@
 <style scoped></style>
 <script setup>
 import { ref, onMounted, getCurrentInstance } from 'vue'
+import AccountSelect from './components/AccountSelect.vue'
+import CompanySelect from './components/CompanySelect.vue'
 
 const $route = getCurrentInstance().proxy.$route;
 const $http = getCurrentInstance().proxy.$http;
@@ -130,7 +128,7 @@ const refProductInfoDialog = ref(null)
 const loading = ref(false)
 const rowIdStr = ref('')
 const companyId = ref('')
-const companies = ref([])
+const accountId = ref('')
 
 const start = new Date()
 const end = new Date()
@@ -169,6 +167,14 @@ const pickerOptions = {
       start.setTime(start.getTime() - 3600 * 1000 * 24 * 365 * 5);
       picker.$emit('pick', [start, end]);
     }
+  }, {
+    text: '最近十年',
+    onClick(picker) {
+      const end = new Date();
+      const start = new Date();
+      start.setTime(start.getTime() - 3600 * 1000 * 24 * 365 * 10);
+      picker.$emit('pick', [start, end]);
+    }
   }]
 }
 
@@ -199,6 +205,7 @@ const tableColsDef = ref([
   { label: '操作时间', },
   { label: '单据', checked: false, },
   { label: '单据类型', checked: false, },
+  { label: '单据日期', checked: false, },
   { label: '交易公司', },
   { label: '生产商', },
   { label: '货品及规格', },
@@ -269,12 +276,12 @@ function getRows() {
       order: 'desc',
       offset: pageSize.value * (page.value - 1),
       limit: pageSize.value,
-      start: daterange.value[0],
-      end: daterange.value[1],
+      start: daterange.value && daterange.value[0] || '',
+      end: daterange.value && daterange.value[1] || '',
       companyId: companyId.value,
-      accountId: getAccountId(),
+      accountId: accountId.value,
       receiptType: receiptType.value,
-      // productCompany: productTreeVal[0],
+      productCompany: productTreeVal.value[0],
       product: productTreeVal.value[1]
     }
   }).then(response => {
@@ -283,11 +290,6 @@ function getRows() {
   }).finally(() => {
     loading.value = false;
   })
-}
-function getAllCompanies() {
-  $http.get(urls.getAllCompanies).then(response => {
-    companies.value.splice(0, companies.value.length, ...response.data.rows);
-  });
 }
 function getProductTree() {
   $http.get(urls.getProductTree).then(response => {
@@ -317,7 +319,6 @@ function handleSelectChange() {
 }
 
 onMounted(() => {
-  getAllCompanies();
   getProductTree();
   getRows();
   initTableCols();
