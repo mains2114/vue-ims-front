@@ -116,4 +116,7 @@ import { useAccountStore } from './stores/account.js'
   i.el-input__icon.el-icon-date {
     display: none;
   }
+  .el-main h3 {
+    margin-top: 0;
+  }
 </style>
