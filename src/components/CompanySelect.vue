@@ -1,5 +1,5 @@
 <template>
-  <el-select v-model="companyId" @change="handleSelectChange" clearable placeholder="请选择交易公司">
+  <el-select v-model="companyId" @change="handleSelectChange" filterable clearable placeholder="请选择交易公司">
     <el-option v-for="item in companies" :key="item.id" :value="item.id"
       :label="item.id + '. ' + item.name"></el-option>
   </el-select>
