@@ -17,6 +17,8 @@
       <!--<el-table-column type="selection"></el-table-column>-->
       <el-table-column prop="id" label="编号" width="80px"></el-table-column>
       <el-table-column prop="name" label="账户名称"></el-table-column>
+      <el-table-column prop="address" label="地址"></el-table-column>
+      <el-table-column prop="phone" label="电话"></el-table-column>
       <el-table-column prop="updated_at" label="修改时间"></el-table-column>
       <el-table-column label="操作">
         <template slot-scope="scope">
@@ -44,14 +46,22 @@
     </el-pagination>
 
     <el-dialog :title="formMode === 'edit' ? '编辑账户' : '添加账户'" :visible.sync="formVisible">
-      <el-form ref="form" v-model="form" label-position="left" label-width="100px">
+      <el-form v-model="form" label-position="left" label-width="100px">
         <el-form-item label="编号" v-if="formMode === 'edit'">
           <el-input v-model="form.id" disabled></el-input>
         </el-form-item>
 
         <el-form-item label="账户名称">
           <el-input v-model="form.name"></el-input>
-          请输入2-50个字符，前置和拖尾的空白会被清除。
+          限定2-50个字符，用于账户标识，以及单据抬头信息。
+        </el-form-item>
+        <el-form-item label="地址">
+          <el-input v-model="form.address"></el-input>
+          限定0-128个字符，用于填充单据中的地址。
+        </el-form-item>
+        <el-form-item label="电话">
+          <el-input v-model="form.phone"></el-input>
+          限定0-128个字符，用于填充单据中的电话。
         </el-form-item>
 
         <el-form-item>
@@ -62,131 +72,120 @@
     </el-dialog>
   </div>
 </template>
-
-<script>
-import { mapStores } from 'pinia'
+<style scoped></style>
+<script setup>
+import { ref, onMounted, getCurrentInstance } from 'vue'
 import { useAccountStore } from './stores/account.js'
+const accountStore = useAccountStore()
 
-  export default {
-    name: "Company",
-    data() {
-      return {
-        loading: false,
-        companyType: '',
-        companySearch: '',
-        rows: [],
-        total: 0,
-        pageSize: 10,
-        page: 1,
-        formVisible: false,
-        formMode: 'add',
-        form: {},
-        urls: {
-          getRows: this.url('/api/account/getAccounts'),
-          delRows: this.url('/api/delRecords'),
-          add: this.url('/api/account/createAccount'),
-          edit: this.url('/api/account/modifyAccount'),
-          getUsers: this.url('/api/account/getUsers'),
-        }
-      };
-    },
-    computed: {
-      ...mapStores(useAccountStore)
-    },
-    methods: {
-      getRows() {
-        this.loading = true;
+const $route = getCurrentInstance().proxy.$route;
+const $message = getCurrentInstance().proxy.$message;
+const $http = getCurrentInstance().proxy.$http;
 
-        this.$http.get(this.urls.getRows, {
-          params: {
-            sort: 'id',
-            order: 'desc',
-            offset: this.pageSize * (this.page - 1),
-            limit: this.pageSize,
-            search: this.companySearch,
-            type: this.companyType
-          }
-        }).then(response => {
-          this.rows = response.data.rows || [];
-          this.total = response.data.total || 0;
+const loading = ref(false)
+const companyType = ref('')
+const companySearch = ref('')
+const rows = ref([])
+const total = ref(0)
+const pageSize = ref(10)
+const page = ref(1)
+const formVisible = ref(false)
+const formMode = ref('add')
+const form = ref({
+  name: '',
+  address: '',
+  phone: '',
+})
+const formDefault = Object.assign({}, form.value);
+const urls = {
+  getRows: '/api/account/getAccounts',
+  delRows: '/api/delRecords',
+  add: '/api/account/createAccount',
+  edit: '/api/account/modifyAccount',
+  getUsers: '/api/account/getUsers',
+}
 
-          this.loading = false;
-        })
-      },
-      deleteRows(module, records) {
-        let form = {
-          module,
-          records
-        };
-
-        this.$http.post(this.urls.delRows, form).then(response => {
-          if (response.data.error === 0) {
-            this.$message.success(response.data.msg || '操作成功');
-
-            this.getRows();
-            return;
-          }
-
-          console.log(response);
-          this.$message.error(response.data.msg || '请求错误');
-        });
-      },
-      handleSizeChange(val) {
-        this.pageSize = val;
-        this.getRows();
-      },
-      handleSelectChange() {
-        this.page = 1;
-        this.getRows();
-      },
-      openFormAdd() {
-        this.formMode = 'add';
-        this.form = {};
-        this.formVisible = true;
-      },
-      openFormEdit(item) {
-        this.formMode = 'edit';
-        this.form = Object.assign({}, item);
-        this.formVisible = true;
-      },
-      switchAccount(item) {
-        this.accountStore.switchAccount(item);
-        this.$message({
-          message: '当前账户已切换为：' + item.name,
-          type: 'success'
-        });
-      },
-      resetAccount() {
-        this.accountStore.switchAccount(null);
-        this.$message({
-          message: '当前账户选择已重置',
-          type: 'success'
-        });
-      },
-      submitForm() {
-        let url = this.formMode === 'add'
-          ? this.urls.add
-          : this.urls.edit;
-
-        this.$http.post(url, this.form).then(response => {
-          if (response.data.error === 0) {
-            this.$message.success(response.data.msg || '操作成功');
-            this.formVisible = false;
-            this.getRows();
-            return;
-          }
-
-          console.log(response);
-          this.$message.error(response.data.msg || '请求错误');
-        });
-      }
-    },
-    created() {
-      this.getRows();
+function getRows() {
+  loading.value = true;
+  $http.get(urls.getRows, {
+    params: {
+      sort: 'id',
+      order: 'desc',
+      offset: pageSize.value * (page.value - 1),
+      limit: pageSize.value,
+      search: companySearch.value,
+      type: companyType.value
     }
-  }
+  }).then(response => {
+    rows.value.splice(0, rows.value.length, ...(response.data.rows || []));
+    total.value = response.data.total || 0;
+    loading.value = false;
+  })
+}
+function deleteRows(module, records) {
+  let form = {
+    module,
+    records
+  };
+  $http.post(urls.delRows, form).then(response => {
+    if (response.data.error === 0) {
+      $message.success(response.data.msg || '操作成功');
+      getRows();
+      return;
+    }
+    console.log(response);
+    $message.error(response.data.msg || '请求错误');
+  });
+}
+function handleSizeChange(val) {
+  pageSize.value = val;
+  getRows();
+}
+function handleSelectChange() {
+  page.value = 1;
+  getRows();
+}
+function openFormAdd() {
+  formMode.value = 'add';
+  Object.assign(form.value, formDefault);
+  formVisible.value = true;
+}
+function openFormEdit(item) {
+  formMode.value = 'edit';
+  Object.assign(form.value, item);
+  formVisible.value = true;
+}
+function switchAccount(item) {
+  accountStore.switchAccount(item);
+  $message({
+    message: '当前账户已切换为：' + item.name,
+    type: 'success'
+  });
+}
+function resetAccount() {
+  accountStore.switchAccount(null);
+  $message({
+    message: '当前账户选择已重置',
+    type: 'success'
+  });
+}
+function submitForm() {
+  let url = formMode.value === 'add'
+    ? urls.add
+    : urls.edit;
+  $http.post(url, form.value).then(response => {
+    if (response.data.error === 0) {
+      $message.success(response.data.msg || '操作成功');
+      formVisible.value = false;
+      getRows();
+      return;
+    }
+    console.log(response);
+    $message.error(response.data.msg || '请求错误');
+  });
+}
+
+onMounted(() => {
+  getRows()
+})
 </script>
-
-<style scoped>
-
-</style>
