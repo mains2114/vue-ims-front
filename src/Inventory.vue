@@ -7,11 +7,11 @@
         <!-- <el-button type="primary" @click="$router.push('export')">出库</el-button> -->
         <el-date-picker v-model="daterange" type="daterange" value-format="yyyy-MM-dd" range-separator="~"
           start-placeholder="开始日期" end-placeholder="结束日期" unlink-panels :picker-options="pickerOptions"></el-date-picker>
-        <el-select v-model="receiptType" @change="handleSelectChange" clearable placeholder="选择单据类型">
+          <AccountSelect v-bind:modelValue.sync="accountId"></AccountSelect>
+          <el-select v-model="receiptType" @change="handleSelectChange" clearable placeholder="选择单据类型">
           <el-option value="in" label="入库"></el-option>
           <el-option value="out" label="出库"></el-option>
         </el-select>
-        <AccountSelect v-bind:modelValue.sync="accountId"></AccountSelect>
         <CompanySelect v-bind:modelValue.sync="companyId"></CompanySelect>
         <el-cascader placeholder="请选择货品" clearable filterable v-model="productTreeVal" :options="productTree"
           :props="{ expandTrigger: 'click', checkStrictly: true }" @change="handleSelectChange"></el-cascader>
@@ -34,7 +34,7 @@
       </el-col>
     </el-row>
     <br>
-    <el-table :data="rows" border v-loading="loading" @selection-change="handleSelectionChange">
+    <el-table :data="rows" border v-loading="loading" @selection-change="handleSelectionChange" highlight-selection-row>
       <el-table-column type="selection" v-if="ifColumnShow('多选框')"></el-table-column>
       <el-table-column prop="id" label="编号" width="70" v-if="ifColumnShow('编号')"></el-table-column>
       <el-table-column prop="receipt_time" label="操作时间" v-if="ifColumnShow('操作时间')"></el-table-column>
@@ -119,6 +119,8 @@
 import { ref, onMounted, getCurrentInstance } from 'vue'
 import AccountSelect from './components/AccountSelect.vue'
 import CompanySelect from './components/CompanySelect.vue'
+import { useAccountStore } from './stores/account.js'
+const accountStore = useAccountStore()
 
 const $route = getCurrentInstance().proxy.$route;
 const $http = getCurrentInstance().proxy.$http;
@@ -129,6 +131,7 @@ const loading = ref(false)
 const rowIdStr = ref('')
 const companyId = ref('')
 const accountId = ref('')
+accountId.value = accountStore.account && accountStore.account.id
 
 const start = new Date()
 const end = new Date()

@@ -22,13 +22,16 @@
           </el-checkbox-group>
           <el-button slot="reference" type="primary" icon="el-icon-menu"></el-button>
         </el-popover>
+        <el-tooltip class="item" effect="dark" content="勾选单据后可导出开票项目" placement="top-start">
+          <el-button type="primary" @click="exportReceiptTpl" :disabled="selectedRows.length <= 0">开票</el-button>
+        </el-tooltip>
       </el-col>
       <!--<el-col :span="12"></el-col>-->
     </el-row>
     <br>
 
-    <el-table :data="rows" border v-loading="loading">
-      <!--<el-table-column type="selection"></el-table-column>-->
+    <el-table :data="rows" border v-loading="loading" @selection-change="handleSelectionChange" highlight-selection-row>
+      <el-table-column type="selection" v-if="ifColumnShow('多选框')"></el-table-column>
       <el-table-column prop="id" label="单据编号" width="150px" v-if="ifColumnShow('单据编号')"></el-table-column>
       <el-table-column prop="company_name" label="交易公司" v-if="ifColumnShow('交易公司')"></el-table-column>
       <el-table-column prop="date" label="制单时间" v-if="ifColumnShow('制单时间')"></el-table-column>
@@ -157,6 +160,8 @@
 import { ref, onMounted, computed, getCurrentInstance } from 'vue'
 import AccountSelect from './components/AccountSelect.vue'
 import CompanySelect from './components/CompanySelect.vue'
+import { useAccountStore } from './stores/account.js'
+const accountStore = useAccountStore()
 
 const $route = getCurrentInstance().proxy.$route;
 const $http = getCurrentInstance().proxy.$http;
@@ -164,8 +169,10 @@ const $message = getCurrentInstance().proxy.$message;
 const getAccountId = getCurrentInstance().proxy.getAccountId;
 
 const loading = ref(false)
+const selectedRows = ref([])
 const companyId = ref('')
 const accountId = ref('')
+accountId.value = accountStore.account && accountStore.account.id
 const receiptType = ref('')
 const receiptSearch = ref('')
 const rows = ref([])
@@ -189,6 +196,7 @@ const formRows = ref([])
 
 const tableCols = ref([]);
 const tableColsDef = ref([
+  { label: '多选框', },
   { label: '单据编号', },
   { label: '交易公司', },
   { label: '制单时间', },
@@ -268,6 +276,22 @@ function methodIsEnableEdit(row) {
 }
 function exportReceipt(receiptId) {
   window.open('/receipt/export/' + receiptId)
+}
+function exportReceiptTpl() {
+  let tmpSet = new Set(selectedRows.value.map(el => el.company_id))
+  if (tmpSet.size > 1) {
+    $message.warning('请选择同一个交易公司的单据进行开票')
+    return;
+  }
+  let rowIdStr = selectedRows.value.map(el => el.id).join(',')
+  window.open('/api/receipt/exportReceiptTpl?receiptIdStr=' + rowIdStr);
+}
+function handleSelectionChange(val) {
+  if (val.length > 0) {
+    selectedRows.value.splice(0, selectedRows.value.length, ...val)
+  } else {
+    selectedRows.value.splice(0, selectedRows.value.length)
+  }
 }
 function getRows() {
   loading.value = true;

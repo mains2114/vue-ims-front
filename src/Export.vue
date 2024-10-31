@@ -130,7 +130,8 @@
         </el-form-item>
       </el-form>
 
-      <el-table ref="selectTable" border="" :data="productsFiltered" height="400" @selection-change="productSelectedChange">
+      <el-table ref="selectTable" border="" :data="productsFiltered" height="400" 
+        @selection-change="productSelectedChange"  highlight-selection-row>
         <el-table-column prop="id" label="编号" type="selection"></el-table-column>
         <el-table-column prop="company_name" label="生产厂家"></el-table-column>
         <el-table-column prop="name" label="名称" width="200" sortable></el-table-column>
