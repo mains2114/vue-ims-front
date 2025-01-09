@@ -49,6 +49,10 @@
       <el-table-column label="操作">
         <template slot-scope="scope">
           <el-button size="small" @click="openFormEdit(scope.row)" type="text">编辑</el-button>
+          &nbsp;
+          <el-popconfirm title="确认删除？" @confirm="deleteRows('confirm_log', [scope.row.id])">
+            <el-button slot="reference" size="small" type="text">删除</el-button>
+          </el-popconfirm>
         </template>
       </el-table-column>
     </el-table>
@@ -260,6 +264,21 @@
       handleSelectChange() {
         this.page = 1;
         this.getRows();
+      },
+      deleteRows(module, records) {
+        let form = {
+          module,
+          records
+        };
+        this.$http.post('/api/delRecords', form).then(response => {
+          if (response.data.error === 0) {
+            this.$message.success(response.data.msg || '操作成功');
+            getRows();
+            return;
+          }
+          console.log(response);
+          this.$message.error(response.data.msg || '请求错误');
+        });
       },
       openFormAdd() {
         this.formMode = 'add';
