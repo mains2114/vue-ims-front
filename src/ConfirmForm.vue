@@ -1,11 +1,9 @@
 <template>
   <el-form inline>
-
     <el-row style="font-size: 24px;">
       <el-col :span="12" :offset="0" align="left">采购验收</el-col>
     </el-row>
     <br>
-
     <el-table border="" :data="tableRows">
       <el-table-column prop="name" label="品名及规格" width="200">
         <template slot-scope="scope">{{ scope.row.name + ' - ' + scope.row.model }}</template>
@@ -124,9 +122,7 @@
         </template>
       </el-table-column>
     </el-table>
-
     <br>
-
     <el-row>
       <el-col :span="12" :offset="6" style="text-align: center;">
         <el-button type="text" icon="el-icon-plus" @click="dialogFormVisible = true">选择货物</el-button>
@@ -138,7 +134,7 @@
       <el-form inline>
         <el-form-item label="生产商" :label-width="formLabelWidth">
           <el-select v-model="productsFilter" placeholder="请选择生产商" filterable @change="getProducts">
-            <el-option v-for="company in computedManufacturer"
+            <el-option v-for="company in companies" v-if="company.type === 'manufacturer'"
                        :key="company.id"
                        :value="company.id"
                        :label="company.id + '. ' + company.name">
@@ -146,8 +142,7 @@
           </el-select>
         </el-form-item>
       </el-form>
-
-      <el-table ref="selectTable" border="" :data="productsFiltered" height="400" @selection-change="productSelectedChange">
+      <el-table ref="selectTable" border="" :data="products" height="400" @selection-change="productSelectedChange">
         <el-table-column prop="id" label="编号" type="selection"></el-table-column>
         <el-table-column prop="company_name" label="生产厂家"></el-table-column>
         <el-table-column prop="name" label="名称" width="200" sortable></el-table-column>
@@ -156,7 +151,6 @@
         <el-table-column prop="price" label="单价"></el-table-column>
         <el-table-column prop="num" label="数量"></el-table-column>
       </el-table>
-
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取 消</el-button>
         <el-button type="primary" @click="chooseProducts">确 定</el-button>
@@ -165,173 +159,135 @@
   </el-form>
 </template>
 
-<script>
-  export default {
-    name: 'app',
-    data() {
-      return {
-        msg: 'hello vue',
-        tableRows: [],
-        dialogFormVisible: false,
-        form: {
-          name: '',
-          region: '',
-          date1: '',
-          date2: '',
-          delivery: false,
-          type: [],
-          resource: '',
-          desc: '',
-        },
-        formLabelWidth: '120px',
-        companyType: null,
-        companies: [],
-        productsFilter: null,
-        products: [],
-        productsSelected: [],
-        companyAuditOptions: [
-          {value: "齐全"},
-          {value: "缺失"},
-        ],
-        packageStatusOptions: [
-          {value: "良好"},
-          {value: "破损"},
-        ],
-        conclusionOptions: [
-          {value: "合格"},
-          {value: "不合格"},
-        ],
-        confirmPersonOptions: [
-          {value: "黄海芳"},
-        ],
-        components: {},
-        urls: {
-          getRows: this.url('/api/getCompanies'),
-          add: this.url('/company/create'),
-          edit: this.url('/company/'),
-          getAllCompanies: this.url('/api/getAllCompanies'),
-          submitForm: this.url('/api/purchase/addConfirmLog'),
-        }
-      }
+<script setup>
+import { ref, onMounted, getCurrentInstance, computed } from 'vue'
+
+const $loading = getCurrentInstance().proxy.$loading;
+const $router = getCurrentInstance().proxy.$router;
+const $message = getCurrentInstance().proxy.$message;
+const $http = getCurrentInstance().proxy.$http;
+const getAccountId = getCurrentInstance().proxy.getAccountId;
+
+const tableRows = ref([]);
+const dialogFormVisible = ref(false);
+const formLabelWidth = ref('120px');
+const companies = ref([]);
+const productsFilter = ref(null);
+const products = ref([]);
+const productsSelected = ref([]);
+const companyAuditOptions = ref([
+  {value: "齐全"},
+  {value: "缺失"},
+]);
+const packageStatusOptions = ref([
+  {value: "良好"},
+  {value: "破损"},
+]);
+const conclusionOptions = ref([
+  {value: "合格"},
+  {value: "不合格"},
+]);
+const confirmPersonOptions = ref([
+  {value: "黄海芳"},
+]);
+const urls = {
+  getAllCompanies: '/api/getAllCompanies',
+  submitForm: '/api/purchase/addConfirmLog',
+};
+const companiesGrouped = computed(() => {
+  let group = {
+    manufacturer: {
+      label: '生产商',
+      children: [],
     },
-    computed: {
-      productsFiltered() {
-        return this.products.filter((value) => {
-          if (!this.productsFilter) {
-            return true;
-          }
-
-          if (value.company.id === this.productsFilter) {
-            return true;
-          } else {
-            return false;
-          }
-        })
-      },
-      companiesGrouped() {
-        let group = {
-          manufacturer: {
-            label: '生产商',
-            children: [],
-          },
-          seller: {
-            label: '销售商',
-            children: [],
-          },
-          customer: {
-            label: '顾客',
-            children: [],
-          }
-        };
-
-        _.each(this.companies, company => {
-          group[ company.type ].children.push(company);
-        });
-
-        return group;
-      },
-      computedManufacturer() {
-        return _.filter(this.companies, company => {
-          return company.type === 'manufacturer';
-        });
-      }
+    seller: {
+      label: '销售商',
+      children: [],
     },
-    filters: {
-    },
-    methods: {
-      getManufacturers() {
-        this.$http.get(this.urls.getAllCompanies).then(response => {
-          this.companies = response.data.rows || [];
-        })
-      },
-      getProducts() {
-        this.$http.get(this.url('/api/getProducts'), {
-          params: {
-            company_id: this.productsFilter,
-            limit: 100
-          }
-        }).then(response => {
-          this.products = response.data.rows;
-        })
-      },
-      productSelectedChange(rows) {
-        this.productsSelected = rows;
-      },
-      chooseProducts() {
-        let selectedRows = this.productsSelected.map(item => {
-          let newItem = _.clone(item);
-          // newItem.price = parseFloat(item.prefer_price);
-          // newItem.num = parseFloat(item.num);
-          return newItem;
-        });
-        this.tableRows = _.unionBy(this.tableRows, selectedRows, 'id');
-        this.dialogFormVisible = false;
-      },
-      deleteTableRow(row) {
-        this.tableRows.splice(
-          _.findIndex(this.tableRows, o => o.id == row.id),
-          1
-        );
-      },
-      submitReceipt() {
-        var form = {
-          company_id: this.companyType,
-          rows: []
-        };
-
-        form.rows = this.tableRows.map((row, index) => {
-          return {
-            account_id: this.getAccountId(),
-            product_id: row.id,
-            batch: row.batch,
-            produce_date: row.produce_date,
-            expire: row.expire,
-            num: row.num2,
-            price: row.price,
-            // batch2: row.batch2,
-            company_id: row.company_id,
-            company_audit: row.company_audit,
-            package_status: row.package_status,
-            conclusion: row.conclusion,
-            confirm_person: row.confirm_person
-          };
-        });
-
-        this.$http.post(this.urls.submitForm, form).then(response => {
-          if (response.data.error === 0) {
-            this.$message.success(response.data.msg || '操作成功');
-            this.$router.push('/purchaseManage/confirmLog');
-            return;
-          }
-
-          console.log(response);
-          this.$message.error(response.data.msg || '请求错误');
-        });
-      }
-    },
-    created() {
-      this.getManufacturers();
-      this.getProducts();
+    customer: {
+      label: '顾客',
+      children: [],
     }
-  }
+  };
+  _.each(companies.value, company => {
+    group[ company.type ].children.push(company);
+  });
+  return group;
+})
+function getManufacturers() {
+  $http.get(urls.getAllCompanies).then(response => {
+    companies.value.splice(0, companies.value.length, ...(response.data.rows || []));
+  })
+}
+function getProducts() {
+  $http.get('/api/getProducts', {
+    params: {
+      company_id: productsFilter.value,
+      limit: 100
+    }
+  }).then(response => {
+    products.value.splice(0, products.value.length, ...response.data.rows);
+  })
+}
+function productSelectedChange(rows) {
+  productsSelected.value.splice(0, productsSelected.value.length, ...rows);
+}
+function chooseProducts() {
+  let selectedRows = productsSelected.value.map(item => {
+    let newItem = _.clone(item);
+    // newItem.price = parseFloat(item.prefer_price);
+    // newItem.num = parseFloat(item.num);
+    return newItem;
+  });
+  tableRows.value.splice(0, tableRows.value.length, ..._.unionBy(tableRows, selectedRows, 'id'));
+  dialogFormVisible.value = false;
+}
+function deleteTableRow(row) {
+  tableRows.value.splice(
+    _.findIndex(tableRows.value, o => o.id == row.id),
+    1
+  );
+}
+function submitReceipt() {
+  const loading = $loading({
+    lock: true,
+    text: '数据提交中...',
+  });
+  var form = {
+    rows: []
+  };
+  form.rows = tableRows.value.map((row, index) => {
+    return {
+      account_id: getAccountId(),
+      product_id: row.id,
+      batch: row.batch,
+      produce_date: row.produce_date,
+      expire: row.expire,
+      num: row.num2,
+      price: row.price,
+      // batch2: row.batch2,
+      company_id: row.company_id,
+      company_audit: row.company_audit,
+      package_status: row.package_status,
+      conclusion: row.conclusion,
+      confirm_person: row.confirm_person
+    };
+  });
+  $http.post(urls.submitForm, form).then(response => {
+    if (response.data.error === 0) {
+      $message.success(response.data.msg || '操作成功');
+      $router.push('/purchaseManage/confirmLog');
+      return;
+    }
+    console.log(response);
+    $message.error(response.data.msg || '请求错误');
+  }).finally(() => {
+    loading.close();
+  });
+}
+
+onMounted(() => {
+  getManufacturers();
+  getProducts();
+})
 </script>

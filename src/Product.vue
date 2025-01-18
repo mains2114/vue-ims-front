@@ -286,6 +286,8 @@ function openFormAdd(item) {
 function openFormEdit(item) {
   formMode.value = 'edit';
   Object.assign(form.value, item);
+  // item.ext可能没有包含所有的字段，因此先使用默认值覆盖一次
+  Object.assign(formExt.value, formExtDefault);
   Object.assign(formExt.value, item.ext);
   formVisible.value = true;
 }
