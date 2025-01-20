@@ -125,7 +125,7 @@
     <br>
     <el-row>
       <el-col :span="12" :offset="6" style="text-align: center;">
-        <el-button type="text" icon="el-icon-plus" @click="dialogFormVisible = true">选择货物</el-button>
+        <el-button type="text" icon="el-icon-plus" @click="openDialog">选择货物</el-button>
         <el-button type="text" icon="el-icon-message" @click="submitReceipt">提交表单</el-button>
       </el-col>
     </el-row>
@@ -168,6 +168,7 @@ const $message = getCurrentInstance().proxy.$message;
 const $http = getCurrentInstance().proxy.$http;
 const getAccountId = getCurrentInstance().proxy.getAccountId;
 
+const selectTable = ref(null);
 const tableRows = ref([]);
 const dialogFormVisible = ref(false);
 const formLabelWidth = ref('120px');
@@ -232,6 +233,14 @@ function getProducts() {
 function productSelectedChange(rows) {
   productsSelected.value.splice(0, productsSelected.value.length, ...rows);
 }
+function openDialog() {
+  dialogFormVisible.value = true;
+  let tmpRows = new Array()
+  tmpRows.push(...productsSelected.value)
+  tmpRows.forEach(row => {
+    selectTable.value.toggleRowSelection(row)
+  })
+}
 function chooseProducts() {
   let selectedRows = productsSelected.value.map(item => {
     let newItem = _.clone(item);
@@ -239,7 +248,7 @@ function chooseProducts() {
     // newItem.num = parseFloat(item.num);
     return newItem;
   });
-  tableRows.value.splice(0, tableRows.value.length, ..._.unionBy(tableRows, selectedRows, 'id'));
+  tableRows.value.splice(0, tableRows.value.length, ..._.unionBy(tableRows.value, selectedRows, 'id'));
   dialogFormVisible.value = false;
 }
 function deleteTableRow(row) {
