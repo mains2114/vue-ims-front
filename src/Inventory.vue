@@ -34,7 +34,9 @@
       </el-col>
     </el-row>
     <br>
-    <el-table :data="rows" border v-loading="loading" @selection-change="handleSelectionChange" highlight-selection-row>
+    <el-table :data="rows" border v-loading="loading" @selection-change="handleSelectionChange" highlight-selection-row
+      show-summary :summary-method="getSummary"
+    >
       <el-table-column type="selection" v-if="ifColumnShow('多选框')"></el-table-column>
       <el-table-column prop="id" label="编号" width="70" v-if="ifColumnShow('编号')"></el-table-column>
       <el-table-column prop="receipt_time" label="操作时间" v-if="ifColumnShow('操作时间')"></el-table-column>
@@ -63,11 +65,7 @@
           {{ parseFloat(scope.row.price) }}
         </template>
       </el-table-column>
-      <el-table-column prop="price_total" label="总价" v-if="ifColumnShow('总价')">
-        <template slot-scope="scope">
-          {{ Math.abs(scope.row.num * scope.row.price).toFixed(2) }}
-        </template>
-      </el-table-column>
+      <el-table-column prop="price_total" label="总价" v-if="ifColumnShow('总价')"></el-table-column>
     </el-table>
     <br>
     <el-pagination layout="total, sizes, prev, pager, next" background @size-change="handleSizeChange"
@@ -288,6 +286,9 @@ function getRows() {
       product: productTreeVal.value[1]
     }
   }).then(response => {
+    response.data.rows.forEach((row, index) => {
+      row.price_total = (- row.num * row.price).toFixed(2);
+    })
     rows.value.splice(0, rows.value.length, ...(response.data.rows || []));
     total.value = response.data.total || 0;
   }).finally(() => {
@@ -319,6 +320,40 @@ function handleSizeChange(val) {
 function handleSelectChange() {
   page.value = 1;
   getRows();
+}
+function getSummary(param) {
+  const { columns, data } = param;
+  const sums = [];
+  columns.forEach((column, index) => {
+    if (index === 0) {
+      sums[index] = '合计';
+      return;
+    }
+    if (['num', 'price_total'].indexOf(column.property) === -1) {
+      sums[index] = '';
+      return;
+    }
+    const values = data.map(item => Number(item[column.property]));
+    if (!values.every(value => isNaN(value))) {
+      sums[index] = values.reduce((prev, curr) => {
+        const value = Number(curr);
+        if (!isNaN(value)) {
+          return prev + curr;
+        } else {
+          return prev;
+        }
+      }, 0);
+      if (column.property === 'price_total') {
+        sums[index] = sums[index].toFixed(2);
+      } else {
+        sums[index] += '';
+      }
+    } else {
+      sums[index] = '';
+    }
+  });
+
+  return sums;
 }
 
 onMounted(() => {

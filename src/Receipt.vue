@@ -7,6 +7,8 @@
       <el-col :span="24">
         <!-- <el-button type="primary" @click="$router.push('import')">入库</el-button> -->
         <el-button type="primary" @click="$router.push('export')">出库</el-button>
+        <el-date-picker v-model="daterange" type="daterange" value-format="yyyy-MM-dd" range-separator="~"
+          start-placeholder="开始日期" end-placeholder="结束日期" unlink-panels :picker-options="pickerOptions"></el-date-picker>
         <AccountSelect v-bind:modelValue.sync="accountId"></AccountSelect>
         <CompanySelect v-bind:modelValue.sync="companyId"></CompanySelect>
         <el-select v-model="receiptType" @change="handleSelectChange" clearable placeholder="选择单据类型">
@@ -30,7 +32,9 @@
     </el-row>
     <br>
 
-    <el-table :data="rows" border v-loading="loading" @selection-change="handleSelectionChange" highlight-selection-row>
+    <el-table :data="rows" border v-loading="loading" @selection-change="handleSelectionChange" highlight-selection-row
+      show-summary :summary-method="getTableSummary"
+    >
       <el-table-column type="selection" v-if="ifColumnShow('多选框')"></el-table-column>
       <el-table-column prop="id" label="单据编号" width="150px" v-if="ifColumnShow('单据编号')"></el-table-column>
       <el-table-column prop="company_name" label="交易公司" v-if="ifColumnShow('交易公司')"></el-table-column>
@@ -40,10 +44,7 @@
           <span>{{ { in: '入库', out: '出库' }[scope.row.type] }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="" label="金额" v-if="ifColumnShow('金额')">
-        <template slot-scope="scope">
-          <span>{{ calcReceiptTotal(scope.row) }}</span>
-        </template>
+      <el-table-column prop="price_total" label="金额" v-if="ifColumnShow('金额')">
       </el-table-column>
       <el-table-column prop="" label="货品" v-if="ifColumnShow('货品')">
         <template slot-scope="scope">
@@ -167,6 +168,54 @@ const $route = getCurrentInstance().proxy.$route;
 const $http = getCurrentInstance().proxy.$http;
 const $message = getCurrentInstance().proxy.$message;
 const getAccountId = getCurrentInstance().proxy.getAccountId;
+
+const start = new Date()
+const end = new Date()
+start.setTime(start.getTime() - 3600 * 1000 * 24 * 365 * 3)
+const daterange = ref([start.toISOString().slice(0, 10), end.toISOString().slice(0, 10)])
+const pickerOptions = {
+  shortcuts: [{
+    text: '最近一年',
+    onClick(picker) {
+      const end = new Date();
+      const start = new Date();
+      start.setTime(start.getTime() - 3600 * 1000 * 24 * 365);
+      picker.$emit('pick', [start, end]);
+    }
+  }, {
+    text: '最近两年',
+    onClick(picker) {
+      const end = new Date();
+      const start = new Date();
+      start.setTime(start.getTime() - 3600 * 1000 * 24 * 365 * 2);
+      picker.$emit('pick', [start, end]);
+    }
+  }, {
+    text: '最近三年',
+    onClick(picker) {
+      const end = new Date();
+      const start = new Date();
+      start.setTime(start.getTime() - 3600 * 1000 * 24 * 365 * 3);
+      picker.$emit('pick', [start, end]);
+    }
+  }, {
+    text: '最近五年',
+    onClick(picker) {
+      const end = new Date();
+      const start = new Date();
+      start.setTime(start.getTime() - 3600 * 1000 * 24 * 365 * 5);
+      picker.$emit('pick', [start, end]);
+    }
+  }, {
+    text: '最近十年',
+    onClick(picker) {
+      const end = new Date();
+      const start = new Date();
+      start.setTime(start.getTime() - 3600 * 1000 * 24 * 365 * 10);
+      picker.$emit('pick', [start, end]);
+    }
+  }]
+}
 
 const loading = ref(false)
 const selectedRows = ref([])
@@ -301,17 +350,56 @@ function getRows() {
       order: 'desc',
       offset: pageSize.value * (page.value - 1),
       limit: pageSize.value,
+      start: daterange.value && daterange.value[0] || '',
+      end: daterange.value && daterange.value[1] || '',
       companyId: companyId.value,
       accountId: accountId.value,
       search: receiptSearch.value,
       type: receiptType.value,
     }
   }).then(response => {
+    response.data.rows.forEach((row, index) => {
+      row.price_total = calcReceiptTotal(row);
+    })
     rows.value.splice(0, rows.value.length, ...(response.data.rows || []));
     total.value = response.data.total || 0;
   }).finally(() => {
     loading.value = false;
   })
+}
+function getTableSummary(param) {
+  const { columns, data } = param;
+  const sums = [];
+  columns.forEach((column, index) => {
+    if (index === 0) {
+      sums[index] = '';
+      return;
+    }
+    if (['num', 'price_total'].indexOf(column.property) === -1) {
+      sums[index] = '';
+      return;
+    }
+    const values = data.map(item => Number(item[column.property]));
+    if (!values.every(value => isNaN(value))) {
+      sums[index] = values.reduce((prev, curr) => {
+        const value = Number(curr);
+        if (!isNaN(value)) {
+          return prev + curr;
+        } else {
+          return prev;
+        }
+      }, 0);
+      if (column.property === 'price_total') {
+        sums[index] = '合计: ' + sums[index].toFixed(2);
+      } else {
+        sums[index] += '';
+      }
+    } else {
+      sums[index] = '';
+    }
+  });
+
+  return sums;
 }
 function deleteRows(module, records) {
   let form = {
