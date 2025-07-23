@@ -67,7 +67,9 @@
                    :page-sizes="[10, 20, 50]">
     </el-pagination>
 
-    <el-dialog :title="formMode === 'edit' ? '编辑' : '添加货品'" :visible.sync="formVisible">
+    <el-dialog :title="formMode === 'edit' ? '编辑' : '添加货品'" :visible.sync="formVisible"
+      width="80%"
+    >
       <el-form ref="form" v-model="form" label-position="left" label-width="110px">
         <el-form-item label="账户">
           <el-input v-model="form.account_name" disabled></el-input>

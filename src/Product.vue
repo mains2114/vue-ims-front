@@ -67,7 +67,10 @@
       @current-change="getRows" :total="total" :page-size="pageSize" :current-page.sync="page"
       :page-sizes="[10, 20, 50]">
     </el-pagination>
-    <el-dialog :title="formMode === 'edit' ? '编辑货品' : '添加货品'" :visible.sync="formVisible">
+    <el-dialog :title="formMode === 'edit' ? '编辑货品' : '添加货品'" :visible.sync="formVisible"
+      width="80%"
+      :before-close="handleClose"
+    >
       <el-form :model="form" label-position="left" label-width="110px">
         <el-form-item label="编号" v-if="formMode === 'edit'">
           <el-input v-model="form.id" disabled></el-input>
@@ -130,6 +133,8 @@ import { ref, onMounted, getCurrentInstance } from 'vue'
 
 const $route = getCurrentInstance().proxy.$route;
 const $message = getCurrentInstance().proxy.$message;
+const $confirm = getCurrentInstance().proxy.$confirm;
+const $loading = getCurrentInstance().proxy.$loading;
 const $http = getCurrentInstance().proxy.$http;
 
 const loading = ref(false);
@@ -292,6 +297,7 @@ function openFormEdit(item) {
   formVisible.value = true;
 }
 function submitForm() {
+  const loading = $loading({ lock: true, text: '数据提交中...' });
   let url = formMode.value === 'add'
     ? urls.add
     : urls.edit + form.value.id;
@@ -307,7 +313,16 @@ function submitForm() {
 
     console.log(response);
     $message.error(response.data.msg || '请求错误');
+  })
+  .catch(e => {
+    $message.error(e);
+  })
+  .finally(() => {
+    loading.close();
   });
+}
+function handleClose(done) {
+  $confirm('确认关闭？').then(_ => done()).catch(_ => {});
 }
 
 onMounted(() => {

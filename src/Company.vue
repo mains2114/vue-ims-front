@@ -56,7 +56,10 @@
                    :page-sizes="[10, 20, 50]">
     </el-pagination>
 
-    <el-dialog :title="formMode === 'edit' ? '编辑公司' : '添加公司'" :visible.sync="formVisible">
+    <el-dialog :title="formMode === 'edit' ? '编辑公司' : '添加公司'" :visible.sync="formVisible"
+      width="80%"
+      :before-close="handleClose"
+    >
       <el-form ref="form" v-model="form" label-position="left" label-width="100px">
         <el-form-item label="编号" v-if="formMode === 'edit'">
           <el-input v-model="form.id" disabled></el-input>
@@ -185,6 +188,7 @@
         this.formVisible = true;
       },
       submitForm() {
+        const loading = this.$loading({ lock: true, text: '数据提交中...' });
         let url = this.formMode === 'add'
           ? this.urls.add
           : this.urls.edit + this.form.id;
@@ -199,8 +203,17 @@
 
           console.log(response);
           this.$message.error(response.data.msg || '请求错误');
+        })
+        .catch(e => {
+          this.$message.error(e);
+        })
+        .finally(() => {
+          loading.close();
         });
-      }
+      },
+      handleClose(done) {
+        this.$confirm('确认关闭？').then(() => done()).catch(() => {});
+      },
     },
     created() {
       this.getRows();

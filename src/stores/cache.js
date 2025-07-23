@@ -8,7 +8,7 @@ export const useCacheStore = defineStore('cache', {
         accounts: [],
         companiesLock: false,
         accountsLock: false,
-        changesVer: 20250226,
+        changesVer: 20250723,
         checkedVer: 0,
     }
   },

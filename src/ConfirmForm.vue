@@ -130,7 +130,9 @@
       </el-col>
     </el-row>
 
-    <el-dialog title="选择货物" :visible.sync="dialogFormVisible">
+    <el-dialog title="选择货物" :visible.sync="dialogFormVisible"
+      width="80%"
+    >
       <el-form inline>
         <el-form-item label="生产商" :label-width="formLabelWidth">
           <el-select v-model="productsFilter" placeholder="请选择生产商" filterable @change="getProducts">
