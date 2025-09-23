@@ -3,7 +3,7 @@
     <h3>公司信息</h3>
 
     <el-row>
-      <el-col :span="24">
+      <el-col :span="24" class="hf-toolbar">
         <el-button type="primary" @click="openFormAdd()">添加</el-button>
 
         <el-select v-model="companyType" @change="handleSelectChange">

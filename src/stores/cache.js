@@ -1,5 +1,9 @@
 // stores/cache.js
 import { defineStore } from 'pinia'
+import md from '../ChangeLog.md?raw';
+
+let result = md.match(/^##\s(\d+\-\d+\-\d+)/);
+console.log('changeLogVersion', result);
 
 export const useCacheStore = defineStore('cache', {
   state: () => {
@@ -8,7 +12,7 @@ export const useCacheStore = defineStore('cache', {
         accounts: [],
         companiesLock: false,
         accountsLock: false,
-        changesVer: 20250723,
+        changesVer: result.length > 1 ? result[1] : '2025-01-01',
         checkedVer: 0,
     }
   },

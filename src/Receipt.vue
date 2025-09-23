@@ -4,7 +4,7 @@
     <p>所有货品出库、入库的单据都可以在这里查看。</p>
 
     <el-row>
-      <el-col :span="24">
+      <el-col :span="24" class="hf-toolbar">
         <!-- <el-button type="primary" @click="$router.push('import')">入库</el-button> -->
         <el-button type="primary" @click="$router.push('export')">出库</el-button>
         <el-date-picker v-model="daterange" type="daterange" value-format="yyyy-MM-dd" range-separator="~"

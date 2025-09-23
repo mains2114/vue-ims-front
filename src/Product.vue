@@ -2,7 +2,7 @@
   <div>
     <h3>货品信息</h3>
     <el-row>
-      <el-col :span="24">
+      <el-col :span="24" class="hf-toolbar">
         <el-button type="primary" @click="openFormAdd()">添加</el-button>
         <el-select v-model="companyId" @change="handleSelectChange" filterable clearable placeholder="请选择生产商">
           <el-option v-for="item in companies" v-if="item.type === 'manufacturer'" :key="item.id" :value="item.id"

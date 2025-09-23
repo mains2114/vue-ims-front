@@ -128,4 +128,8 @@ import { useCacheStore } from './stores/cache.js';
     top: 10px;
     right: 20px;
   }
+  .hf-toolbar {
+    display: inline-flex;
+    gap: 3px;
+  }
 </style>

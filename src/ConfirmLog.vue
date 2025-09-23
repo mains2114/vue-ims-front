@@ -3,7 +3,7 @@
     <h3>验收记录</h3>
 
     <el-row>
-      <el-col :span="24">
+      <el-col :span="24" class="hf-toolbar">
         <el-button type="primary" @click="$router.push('confirmForm')">采购验收</el-button>
         <el-button type="primary" @click="$router.push('confirmImport')">验收入库</el-button>
 
@@ -149,6 +149,8 @@
 </template>
 
 <script>
+import _ from 'lodash'
+
   export default {
     name: "Company",
     data() {

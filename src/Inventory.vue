@@ -2,7 +2,7 @@
   <div>
     <h3>货品流水</h3>
     <el-row>
-      <el-col :span="24">
+      <el-col :span="24" class="hf-toolbar">
         <!-- <el-button type="primary" @click="$router.push('import')">入库</el-button> -->
         <!-- <el-button type="primary" @click="$router.push('export')">出库</el-button> -->
         <el-date-picker v-model="daterange" type="daterange" value-format="yyyy-MM-dd" range-separator="~"
