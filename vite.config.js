@@ -3,6 +3,7 @@ import vue from '@vitejs/plugin-vue2'
 
 // https://vite.dev/config/
 export default defineConfig({
+    base: './',
     server: {
         host: '127.0.0.1',
         proxy: {
@@ -15,4 +16,12 @@ export default defineConfig({
         },
     },
     plugins: [vue()],
+    resolve: {
+        alias: [
+            {
+                find: 'vue',
+                replacement: 'vue/dist/vue.runtime.esm.js'
+            },
+        ],
+    },
 })
