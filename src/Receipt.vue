@@ -159,6 +159,7 @@
 <style scoped></style>
 <script setup>
 import { ref, onMounted, computed, getCurrentInstance } from 'vue'
+import _ from 'lodash'
 import AccountSelect from './components/AccountSelect.vue'
 import CompanySelect from './components/CompanySelect.vue'
 import { useAccountStore } from './stores/account.js'
