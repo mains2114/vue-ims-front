@@ -1,3 +1,153 @@
+<script setup>
+import { ref, reactive, onMounted, getCurrentInstance } from 'vue';
+import axios from 'axios';
+
+const $route = getCurrentInstance().proxy.$route;
+const $message = getCurrentInstance().proxy.$message;
+const $confirm = getCurrentInstance().proxy.$confirm;
+const $loading = getCurrentInstance().proxy.$loading;
+
+// 状态定义
+const loading = ref(false);
+const companyTypes = reactive({
+  manufacturer: '生产商',
+  seller: '销售商',
+  customer: '顾客',
+});
+const companyType = ref('');
+const companySearch = ref('');
+const rows = ref([]);
+const total = ref(0);
+const pageSize = ref(10);
+const page = ref(1);
+const formVisible = ref(false);
+const formMode = ref('add');
+const form = ref({
+  id: '',
+  name: '',
+  full_name: '',
+  type: '',
+  address: '',
+  contact: '',
+  tel: ''
+});
+const formDefault = Object.assign({}, form.value);
+
+// 计算属性或方法中使用的辅助函数
+const url = (path) => {
+  // 这里假设url方法是全局可用的，或者从某个地方导入
+  return path;
+};
+
+// URL定义
+const urls = reactive({
+  getRows: url('/api/getCompanies'),
+  delRows: url('/api/delRecords'),
+  add: url('/company/create'),
+  edit: url('/company/'),
+  getAllCompanies: url('/api/getAllCompanies')
+});
+
+// 方法定义
+const getRows = () => {
+  loading.value = true;
+
+  // 假设$http是全局可用的，或者从某个地方导入
+  axios.get(urls.getRows, {
+    params: {
+      sort: 'id',
+      order: 'desc',
+      offset: pageSize.value * (page.value - 1),
+      limit: pageSize.value,
+      search: companySearch.value,
+      type: companyType.value
+    }
+  }).then(response => {
+    rows.value = response.data.rows || [];
+    total.value = response.data.total || 0;
+
+    loading.value = false;
+  });
+};
+
+const deleteRows = (module, records) => {
+  let formData = {
+    module,
+    records
+  };
+
+  axios.post(urls.delRows, formData).then(response => {
+    if (response.data.error === 0) {
+      $message.success(response.data.msg || '操作成功');
+      getRows();
+      return;
+    }
+
+    console.log(response);
+    $message.error(response.data.msg || '请求错误');
+  });
+};
+
+const handleSizeChange = (val) => {
+  pageSize.value = val;
+  getRows();
+};
+
+const handleSelectChange = () => {
+  page.value = 1;
+  getRows();
+};
+
+const openFormAdd = () => {
+  formMode.value = 'add';
+  Object.assign(form.value, formDefault);
+  formVisible.value = true;
+};
+
+const openFormEdit = (item) => {
+  // console.log(JSON.stringify(form.value));
+  // console.log(JSON.stringify(item));
+  formMode.value = 'edit';
+  Object.assign(form.value, item);
+  formVisible.value = true;
+  // console.log(JSON.stringify(form.value));
+};
+
+const submitForm = () => {
+  const loadingInstance = $loading({ lock: true, text: '数据提交中...' });
+  let url = formMode.value === 'add'
+    ? urls.add
+    : urls.edit + form.value.id;
+
+  axios.post(url, form.value).then(response => {
+    if (response.data.error === 0) {
+      $message.success(response.data.msg || '操作成功');
+      formVisible.value = false;
+      getRows();
+      return;
+    }
+
+    console.log(response);
+    $message.error(response.data.msg || '请求错误');
+  })
+  .catch(e => {
+    $message.error(e);
+  })
+  .finally(() => {
+    loadingInstance.close();
+  });
+};
+
+const handleClose = (done) => {
+  $confirm('确认关闭？').then(() => done()).catch(() => {});
+};
+
+// 生命周期钩子
+onMounted(() => {
+  getRows();
+});
+</script>
+
 <template>
   <div>
     <h3>公司信息</h3>
@@ -60,7 +210,7 @@
       width="80%"
       :before-close="handleClose"
     >
-      <el-form ref="form" v-model="form" label-position="left" label-width="100px">
+      <el-form v-model="form" label-position="left" label-width="100px">
         <el-form-item label="编号" v-if="formMode === 'edit'">
           <el-input v-model="form.id" disabled></el-input>
         </el-form-item>
@@ -101,125 +251,6 @@
     </el-dialog>
   </div>
 </template>
-
-<script>
-  export default {
-    name: "Company",
-    data() {
-      return {
-        loading: false,
-        companyTypes: {
-          manufacturer: '生产商',
-          seller: '销售商',
-          customer: '顾客',
-        },
-        companyType: '',
-        companySearch: '',
-        rows: [],
-        total: 0,
-        pageSize: 10,
-        page: 1,
-        formVisible: false,
-        formMode: 'add',
-        form: {},
-        urls: {
-          getRows: this.url('/api/getCompanies'),
-          delRows: this.url('/api/delRecords'),
-          add: this.url('/company/create'),
-          edit: this.url('/company/'),
-          getAllCompanies: this.url('/api/getAllCompanies')
-        }
-      };
-    },
-    methods: {
-      getRows() {
-        this.loading = true;
-
-        this.$http.get(this.urls.getRows, {
-          params: {
-            sort: 'id',
-            order: 'desc',
-            offset: this.pageSize * (this.page - 1),
-            limit: this.pageSize,
-            search: this.companySearch,
-            type: this.companyType
-          }
-        }).then(response => {
-          this.rows = response.data.rows || [];
-          this.total = response.data.total || 0;
-
-          this.loading = false;
-        })
-      },
-      deleteRows(module, records) {
-        let form = {
-          module,
-          records
-        };
-
-        this.$http.post(this.urls.delRows, form).then(response => {
-          if (response.data.error === 0) {
-            this.$message.success(response.data.msg || '操作成功');
-
-            this.getRows();
-            return;
-          }
-
-          console.log(response);
-          this.$message.error(response.data.msg || '请求错误');
-        });
-      },
-      handleSizeChange(val) {
-        this.pageSize = val;
-        this.getRows();
-      },
-      handleSelectChange() {
-        this.page = 1;
-        this.getRows();
-      },
-      openFormAdd() {
-        this.formMode = 'add';
-        this.form = {};
-        this.formVisible = true;
-      },
-      openFormEdit(item) {
-        this.formMode = 'edit';
-        this.form = Object.assign({}, item);
-        this.formVisible = true;
-      },
-      submitForm() {
-        const loading = this.$loading({ lock: true, text: '数据提交中...' });
-        let url = this.formMode === 'add'
-          ? this.urls.add
-          : this.urls.edit + this.form.id;
-
-        this.$http.post(url, this.form).then(response => {
-          if (response.data.error === 0) {
-            this.$message.success(response.data.msg || '操作成功');
-            this.formVisible = false;
-            this.getRows();
-            return;
-          }
-
-          console.log(response);
-          this.$message.error(response.data.msg || '请求错误');
-        })
-        .catch(e => {
-          this.$message.error(e);
-        })
-        .finally(() => {
-          loading.close();
-        });
-      },
-      handleClose(done) {
-        this.$confirm('确认关闭？').then(() => done()).catch(() => {});
-      },
-    },
-    created() {
-      this.getRows();
-    }
-  }
-</script>
 
 <style scoped>
 

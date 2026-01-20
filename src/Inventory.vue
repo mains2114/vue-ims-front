@@ -7,8 +7,8 @@
         <!-- <el-button type="primary" @click="$router.push('export')">出库</el-button> -->
         <el-date-picker v-model="daterange" type="daterange" value-format="yyyy-MM-dd" range-separator="~"
           start-placeholder="开始日期" end-placeholder="结束日期" unlink-panels :picker-options="pickerOptions"></el-date-picker>
-          <AccountSelect v-bind:modelValue.sync="accountId"></AccountSelect>
-          <el-select v-model="receiptType" @change="handleSelectChange" clearable placeholder="选择单据类型">
+        <AccountSelect v-bind:modelValue.sync="accountId"></AccountSelect>
+        <el-select v-model="receiptType" @change="handleSelectChange" clearable placeholder="选择单据类型">
           <el-option value="in" label="入库"></el-option>
           <el-option value="out" label="出库"></el-option>
         </el-select>

@@ -193,6 +193,7 @@ const conclusionOptions = ref([
 ]);
 const confirmPersonOptions = ref([
   {value: "黄海芳"},
+  {value: "李泽维"},
 ]);
 const urls = {
   getAllCompanies: '/api/getAllCompanies',
