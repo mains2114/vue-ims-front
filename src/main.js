@@ -5,7 +5,7 @@ import _ from 'lodash'
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 // import './element-variables.scss'
-import Index from './Index.vue'
+import Index from './views/Index.vue'
 import ProductInfoDialog from './components/ProductInfoDialog.vue'
 import { createPinia, PiniaVuePlugin } from 'pinia'
 
@@ -82,20 +82,20 @@ Vue.use(PiniaVuePlugin);
 const pinia = createPinia()
 
 const routes = [
-  { path: '/', component: () => import('./Dashboard.vue') },
-  { path: '/import', component: () => import('./Import.vue') },
-  { path: '/export', component: () => import('./Export.vue') },
-  { path: '/company', component: () => import('./Company.vue') },
-  { path: '/product', component: () => import('./Product.vue') },
-  { path: '/receipt', component: () => import('./Receipt.vue') },
-  { path: '/inventory', component: () => import('./Inventory.vue') },
-  // { path: '/purchaseManage/purchasePlan', component: () => import('./Import.vue') },
-  { path: '/purchaseManage/ConfirmForm', component: () => import('./ConfirmForm.vue') },
-  { path: '/purchaseManage/ConfirmLog', component: () => import('./ConfirmLog.vue') },
-  { path: '/purchaseManage/ConfirmImport', component: () => import('./ConfirmImport.vue') },
-  { path: '/changes', component: () => import('./Changes.vue') },
-  { path: '/profile', component: () => import('./Profile.vue') },
-  { path: '/manage', component: () => import('./Manage.vue') },
+  { path: '/', component: () => import('./views/Dashboard.vue') },
+  { path: '/import', component: () => import('./views/Import.vue') },
+  { path: '/export', component: () => import('./views/Export.vue') },
+  { path: '/company', component: () => import('./views/Company.vue') },
+  { path: '/product', component: () => import('./views/Product.vue') },
+  { path: '/receipt', component: () => import('./views/Receipt.vue') },
+  { path: '/inventory', component: () => import('./views/Inventory.vue') },
+  // { path: '/purchaseManage/purchasePlan', component: () => import('./views/Import.vue') },
+  { path: '/purchaseManage/ConfirmForm', component: () => import('./views/ConfirmForm.vue') },
+  { path: '/purchaseManage/ConfirmLog', component: () => import('./views/ConfirmLog.vue') },
+  { path: '/purchaseManage/ConfirmImport', component: () => import('./views/ConfirmImport.vue') },
+  { path: '/changes', component: () => import('./views/Changes.vue') },
+  { path: '/profile', component: () => import('./views/Profile.vue') },
+  { path: '/manage', component: () => import('./views/Manage.vue') },
 ];
 
 const router = new Router({

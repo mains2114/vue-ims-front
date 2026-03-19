@@ -115,9 +115,9 @@
 <style scoped></style>
 <script setup>
 import { ref, onMounted, getCurrentInstance } from 'vue'
-import AccountSelect from './components/AccountSelect.vue'
-import CompanySelect from './components/CompanySelect.vue'
-import { useAccountStore } from './stores/account.js'
+import AccountSelect from '../components/AccountSelect.vue'
+import CompanySelect from '../components/CompanySelect.vue'
+import { useAccountStore } from '../stores/account.js'
 const accountStore = useAccountStore()
 
 const $route = getCurrentInstance().proxy.$route;

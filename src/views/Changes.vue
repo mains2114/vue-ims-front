@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, getCurrentInstance } from 'vue'
-import { useCacheStore } from './stores/cache.js';
-import md from './ChangeLog.md?raw';
+import { useCacheStore } from '../stores/cache.js';
+import md from '../ChangeLog.md?raw';
 
 const cache = useCacheStore()
 

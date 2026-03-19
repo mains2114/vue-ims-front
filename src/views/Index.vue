@@ -44,8 +44,8 @@
 
 <script>
 import { mapStores } from 'pinia'
-import { useAccountStore } from './stores/account.js'
-import { useCacheStore } from './stores/cache.js';
+import { useAccountStore } from '../stores/account.js'
+import { useCacheStore } from '../stores/cache.js';
 
   export default {
     name: "Index",

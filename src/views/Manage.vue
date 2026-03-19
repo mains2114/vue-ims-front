@@ -75,7 +75,7 @@
 <style scoped></style>
 <script setup>
 import { ref, onMounted, getCurrentInstance } from 'vue'
-import { useAccountStore } from './stores/account.js'
+import { useAccountStore } from '../stores/account.js'
 const accountStore = useAccountStore()
 
 const $route = getCurrentInstance().proxy.$route;
