@@ -45,6 +45,7 @@
               <el-table-column prop="expire" label="过期时间" width="100px"></el-table-column>
               <el-table-column prop="num" label="库存"></el-table-column>
             </el-table>
+            <el-button type="text" @click="goToInventory(scope.row)" style="width: 100%;">查看流水</el-button>
             <a href="#" slot="reference" @click.prevent>
               {{ scope.row.storage.reduce((acc, curr) => acc + parseInt(curr.num), 0) }}
             </a>
@@ -132,6 +133,7 @@
 import { ref, onMounted, getCurrentInstance } from 'vue'
 
 const $route = getCurrentInstance().proxy.$route;
+const $router = getCurrentInstance().proxy.$router;
 const $message = getCurrentInstance().proxy.$message;
 const $confirm = getCurrentInstance().proxy.$confirm;
 const $loading = getCurrentInstance().proxy.$loading;
@@ -228,6 +230,15 @@ const urls = {
   getAllCompanies: '/api/getAllCompanies',
 };
 
+const goToInventory = (product) => {
+  $router.push({
+    path: '/inventory',
+    query: {
+      productCompany: product.company_id,
+      productId: product.id,
+    }
+  });
+};
 function getRows() {
   loading.value = true;
   $http.get(urls.getRows, {
@@ -285,6 +296,7 @@ function openFormAdd(item) {
   } else {
     Object.assign(form.value, formDefault);
     Object.assign(formExt.value, formExtDefault);
+    form.value.company_id = companyId.value;
   }
   formVisible.value = true;
 }
@@ -326,6 +338,11 @@ function handleClose(done) {
 }
 
 onMounted(() => {
+  // 检查 URL 参数中是否有 company_id
+  if ($route.query.companyId) {
+    companyId.value = parseInt($route.query.companyId);
+  }
+
   getAllCompanies();
   getRows();
 

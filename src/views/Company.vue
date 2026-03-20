@@ -3,6 +3,7 @@ import { ref, reactive, onMounted, getCurrentInstance } from 'vue';
 import axios from 'axios';
 
 const $route = getCurrentInstance().proxy.$route;
+const $router = getCurrentInstance().proxy.$router;
 const $message = getCurrentInstance().proxy.$message;
 const $confirm = getCurrentInstance().proxy.$confirm;
 const $loading = getCurrentInstance().proxy.$loading;
@@ -142,6 +143,15 @@ const handleClose = (done) => {
   $confirm('确认关闭？').then(() => done()).catch(() => {});
 };
 
+const goToProducts = (company) => {
+  $router.push({
+    path: '/product',
+    query: {
+      companyId: company.id,
+    }
+  });
+};
+
 // 生命周期钩子
 onMounted(() => {
   getRows();
@@ -179,6 +189,11 @@ onMounted(() => {
       <el-table-column prop="type" label="类型">
         <template slot-scope="scope">
           {{ companyTypes[ scope.row.type ] }}
+        </template>
+      </el-table-column>
+      <el-table-column prop="products_count" label="相关产品">
+        <template slot-scope="scope">
+          <el-button size="small" type="text" @click="goToProducts(scope.row)">{{ scope.row.products_count || 0 }}</el-button>
         </template>
       </el-table-column>
       <el-table-column prop="contact" label="联系人"></el-table-column>

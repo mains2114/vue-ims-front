@@ -122,7 +122,6 @@ const accountStore = useAccountStore()
 
 const $route = getCurrentInstance().proxy.$route;
 const $http = getCurrentInstance().proxy.$http;
-const getAccountId = getCurrentInstance().proxy.getAccountId;
 
 const refProductInfoDialog = ref(null)
 const loading = ref(false)
@@ -357,6 +356,14 @@ function getSummary(param) {
 }
 
 onMounted(() => {
+  // 检查 URL 参数中是否有 company_id
+  if ($route.query.productCompany) {
+    productTreeVal.value[0] = parseInt($route.query.productCompany);
+    if ($route.query.productId) {
+      productTreeVal.value[1] = parseInt($route.query.productId);
+    }
+  }
+
   getProductTree();
   getRows();
   initTableCols();
