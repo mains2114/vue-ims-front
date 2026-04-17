@@ -248,6 +248,10 @@ function openDialog() {
 function chooseProducts() {
   let selectedRows = productsSelected.value.map(item => {
     let newItem = _.clone(item);
+    newItem.company_audit = companyAuditOptions.value[0].value;
+    newItem.package_status = packageStatusOptions.value[0].value;
+    newItem.conclusion = conclusionOptions.value[0].value;  
+    newItem.confirm_person = confirmPersonOptions.value[0].value;  
     // newItem.price = parseFloat(item.prefer_price);
     // newItem.num = parseFloat(item.num);
     return newItem;

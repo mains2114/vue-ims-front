@@ -102,6 +102,13 @@ const router = new Router({
   routes
 });
 
+// 设置页面标题
+if (import.meta.env.MODE === 'production') {
+  document.title = '库存管理';
+} else {
+  document.title = '库存管理 - ' + import.meta.env.MODE;
+}
+
 new Vue({
   router,
   pinia,

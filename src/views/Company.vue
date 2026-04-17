@@ -202,6 +202,7 @@ onMounted(() => {
       <el-table-column label="操作">
         <template slot-scope="scope">
           <el-button size="small" @click="openFormEdit(scope.row)" type="text">编辑</el-button>
+          &nbsp;
           <el-popconfirm title="确认删除？"
             @confirm="deleteRows('company', [scope.row.id])"
           >

@@ -45,7 +45,6 @@
               <el-table-column prop="expire" label="过期时间" width="100px"></el-table-column>
               <el-table-column prop="num" label="库存"></el-table-column>
             </el-table>
-            <el-button type="text" @click="goToInventory(scope.row)" style="width: 100%;">查看流水</el-button>
             <a href="#" slot="reference" @click.prevent>
               {{ scope.row.storage.reduce((acc, curr) => acc + parseInt(curr.num), 0) }}
             </a>
@@ -60,6 +59,8 @@
           <el-popconfirm title="确认删除？" @confirm="deleteRows('product', [scope.row.id])">
             <el-button slot="reference" size="small" type="text">删除</el-button>
           </el-popconfirm>
+          &nbsp;
+          <el-button size="small" @click="goToInventory(scope.row)" type="text">流水</el-button>
         </template>
       </el-table-column>
     </el-table>
