@@ -89,6 +89,7 @@ const routes = [
   { path: '/product', component: () => import('./views/Product.vue') },
   { path: '/receipt', component: () => import('./views/Receipt.vue') },
   { path: '/inventory', component: () => import('./views/Inventory.vue') },
+  { path: '/fapiao', component: () => import('./views/Fapiao.vue') },
   // { path: '/purchaseManage/purchasePlan', component: () => import('./views/Import.vue') },
   { path: '/purchaseManage/ConfirmForm', component: () => import('./views/ConfirmForm.vue') },
   { path: '/purchaseManage/ConfirmLog', component: () => import('./views/ConfirmLog.vue') },
